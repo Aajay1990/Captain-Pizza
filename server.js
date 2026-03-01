@@ -15,6 +15,7 @@ import { fileURLToPath } from 'url';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import seedAdmin from './utils/seedAdmin.js';
 import seedMenu from './utils/seedMenu.js';
+import seedReviews from './utils/seedReviews.js';
 
 // Initialize environment variables mapping
 dotenv.config();
@@ -50,6 +51,8 @@ const connectDB = async () => {
         await seedAdmin();
         // Seed default menu if DB is empty for in-memory DB or first run
         await seedMenu();
+        // Seed initial reviews if DB is empty
+        await seedReviews();
     } catch (err) {
         console.error('Database connection failed', err);
     }
