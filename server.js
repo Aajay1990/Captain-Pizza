@@ -70,7 +70,7 @@ app.use('/api/toppings', toppingRoutes);
 app.use('/api/upload', uploadRoutes);
 
 app.get('/', (req, res) => {
-    res.send('API is running for Pizza Wing...');
+    res.send('API is running for Captain Pizza...');
 });
 
 // Setting server to listen
