@@ -10,38 +10,45 @@ const sendEmail = async (options) => {
         return { success: true, mock: true };
     }
 
-    // Ensure values are clean
     const host = process.env.SMTP_HOST?.trim();
     const port = parseInt(process.env.SMTP_PORT?.trim()) || 587;
     const user = process.env.SMTP_USER?.trim();
     const pass = process.env.SMTP_PASS?.trim();
 
-    // Use Port 465 for SSL, others for STARTTLS (secure: false)
-    const isSecure = port === 465;
+    const isGmail = host?.includes('gmail.com');
 
-    console.log(`[EMAIL ATTEMPT] Preparing to send to ${options.email} via ${host}:${port} (Secure: ${isSecure})`);
+    console.log(`[EMAIL ATTEMPT] Target: ${options.email} | Provider: ${isGmail ? 'GMAIL SERVICE' : host}`);
 
-    const transporter = nodemailer.createTransport({
-        host: host,
-        port: port,
-        secure: isSecure,
+    let transporterOptions = {
         auth: {
             user: user,
             pass: pass
-        },
-        connectionTimeout: 15000, // 15 seconds
-        greetingTimeout: 15000,
+        }
+    };
+
+    if (isGmail) {
+        // Nodemailer's built-in Gmail service handles port/secure automatically
+        transporterOptions.service = 'gmail';
+    } else {
+        transporterOptions.host = host;
+        transporterOptions.port = port;
+        transporterOptions.secure = (port === 465);
+        transporterOptions.tls = {
+            rejectUnauthorized: false
+        };
+    }
+
+    const transporter = nodemailer.createTransport({
+        ...transporterOptions,
+        connectionTimeout: 20000,
+        greetingTimeout: 20000,
         socketTimeout: 30000,
-        tls: {
-            rejectUnauthorized: false, // Essential for many shared/cloud hosts
-            minVersion: 'TLSv1.2'
-        },
-        debug: true, // Enable internal logging
-        logger: true
+        logger: true,
+        debug: true
     });
 
     const mailOptions = {
-        from: `"Captain Pizza" <${user}>`, // Must match SMTP user for many providers
+        from: `"Captain Pizza" <${user}>`,
         to: options.email,
         subject: options.subject,
         text: options.message,
@@ -50,14 +57,11 @@ const sendEmail = async (options) => {
 
     try {
         const info = await transporter.sendMail(mailOptions);
-        console.log(`[EMAIL SUCCESS] Message ID: ${info.messageId} sent to ${options.email}`);
+        console.log(`[EMAIL SUCCESS] ${options.email}`);
         return { success: true, messageId: info.messageId };
     } catch (err) {
-        console.error(`[EMAIL CRITICAL ERROR] Destination: ${options.email} | Error: ${err.message}`);
-        console.error(`[SMT DETAILS] Host: ${host}, User: ${user}, Port: ${port}`);
-
-        // This time, we return the full error so we can debug it via API
-        return { success: false, error: err.message, stack: err.stack };
+        console.error(`[EMAIL FATAL] ${err.message}`);
+        return { success: false, error: err.message };
     }
 };
 
