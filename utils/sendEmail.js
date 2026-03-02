@@ -10,25 +10,25 @@ const sendEmail = async (options) => {
         return { success: true, mock: true };
     }
 
-    const host = process.env.SMTP_HOST?.trim() || 'smtp.gmail.com';
     const user = process.env.SMTP_USER?.trim();
     const pass = process.env.SMTP_PASS?.trim();
 
-    // Gmail usually works BEST on Port 465 with explicit SSL on Cloud servers like Render
-    console.log(`[FINAL EMAIL ATTEMPT] To: ${options.email} using Port 465 (SSL)`);
+    console.log(`[ULTIMATE SMTP ATTEMPT] Target: ${options.email} via Port 465 (Pool Enabled)`);
 
     const transporter = nodemailer.createTransport({
-        service: 'gmail', // Let nodemailer handle the heavy lifting for Gmail
         host: 'smtp.gmail.com',
         port: 465,
-        secure: true, // true for 465, false for 587
+        secure: true, // MUST be true for port 465
+        pool: true,   // Use connection pooling to avoid frequent handshakes
         auth: {
             user: user,
             pass: pass
         },
-        timeout: 25000, // 25 seconds for slow network
+        connectionTimeout: 30000,
+        greetingTimeout: 30000,
+        socketTimeout: 45000,
         tls: {
-            rejectUnauthorized: false // Skip self-signed cert issues
+            rejectUnauthorized: false
         }
     });
 
@@ -45,7 +45,7 @@ const sendEmail = async (options) => {
         console.log(`[EMAIL SUCCESS] OTP delivered to ${options.email}`);
         return { success: true, messageId: info.messageId };
     } catch (err) {
-        console.error(`[EMAIL ERROR] Primary Port Failed: ${err.message}`);
+        console.error(`[EMAIL ERROR] Critical Failure: ${err.message}`);
         return { success: false, error: err.message };
     }
 };
