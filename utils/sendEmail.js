@@ -10,41 +10,26 @@ const sendEmail = async (options) => {
         return { success: true, mock: true };
     }
 
-    const host = process.env.SMTP_HOST?.trim();
-    const port = parseInt(process.env.SMTP_PORT?.trim()) || 587;
+    const host = process.env.SMTP_HOST?.trim() || 'smtp.gmail.com';
     const user = process.env.SMTP_USER?.trim();
     const pass = process.env.SMTP_PASS?.trim();
 
-    const isGmail = host?.includes('gmail.com');
+    // Gmail usually works BEST on Port 465 with explicit SSL on Cloud servers like Render
+    console.log(`[FINAL EMAIL ATTEMPT] To: ${options.email} using Port 465 (SSL)`);
 
-    console.log(`[EMAIL ATTEMPT] Target: ${options.email} | Provider: ${isGmail ? 'GMAIL SERVICE' : host}`);
-
-    let transporterOptions = {
+    const transporter = nodemailer.createTransport({
+        service: 'gmail', // Let nodemailer handle the heavy lifting for Gmail
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true, // true for 465, false for 587
         auth: {
             user: user,
             pass: pass
+        },
+        timeout: 25000, // 25 seconds for slow network
+        tls: {
+            rejectUnauthorized: false // Skip self-signed cert issues
         }
-    };
-
-    if (isGmail) {
-        // Nodemailer's built-in Gmail service handles port/secure automatically
-        transporterOptions.service = 'gmail';
-    } else {
-        transporterOptions.host = host;
-        transporterOptions.port = port;
-        transporterOptions.secure = (port === 465);
-        transporterOptions.tls = {
-            rejectUnauthorized: false
-        };
-    }
-
-    const transporter = nodemailer.createTransport({
-        ...transporterOptions,
-        connectionTimeout: 20000,
-        greetingTimeout: 20000,
-        socketTimeout: 30000,
-        logger: true,
-        debug: true
     });
 
     const mailOptions = {
@@ -57,10 +42,10 @@ const sendEmail = async (options) => {
 
     try {
         const info = await transporter.sendMail(mailOptions);
-        console.log(`[EMAIL SUCCESS] ${options.email}`);
+        console.log(`[EMAIL SUCCESS] OTP delivered to ${options.email}`);
         return { success: true, messageId: info.messageId };
     } catch (err) {
-        console.error(`[EMAIL FATAL] ${err.message}`);
+        console.error(`[EMAIL ERROR] Primary Port Failed: ${err.message}`);
         return { success: false, error: err.message };
     }
 };
