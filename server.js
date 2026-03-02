@@ -12,7 +12,6 @@ import toppingRoutes from './routes/toppingRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { MongoMemoryServer } from 'mongodb-memory-server';
 import seedAdmin from './utils/seedAdmin.js';
 import seedMenu from './utils/seedMenu.js';
 import seedReviews from './utils/seedReviews.js';
@@ -34,18 +33,16 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Database Connection
 const connectDB = async () => {
     try {
-        if (process.env.MONGO_URI) {
-            await mongoose.connect(process.env.MONGO_URI, {
-                family: 4,
-                serverSelectionTimeoutMS: 5000
-            });
-            console.log('Database Connected Successfully to URI');
-        } else {
-            console.log('No MONGO_URI found. Starting isolated In-Memory MongoDB Server...');
-            const mongoServer = await MongoMemoryServer.create();
-            await mongoose.connect(mongoServer.getUri());
-            console.log(`In-Memory MongoDB Connected at: ${mongoServer.getUri()}`);
+        if (!process.env.MONGO_URI) {
+            console.error('FATAL ERROR: MONGO_URI is not defined in environment variables.');
+            process.exit(1);
         }
+
+        await mongoose.connect(process.env.MONGO_URI, {
+            family: 4,
+            serverSelectionTimeoutMS: 5000
+        });
+        console.log('Database Connected Successfully to production URI');
 
         // Seed initial admin user if not exists
         await seedAdmin();
