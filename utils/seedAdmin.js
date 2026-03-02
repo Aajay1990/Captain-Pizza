@@ -12,13 +12,17 @@ const seedAdmin = async () => {
 
             await User.create({
                 email: adminEmail,
+                name: 'Aajay Sharma',
                 password: hashedPassword,
                 role: 'admin',
                 isVerified: true
             });
-            console.log('✅ Default Admin created: admin@captainpizza.com / admin123');
+            console.log('✅ Default Admin created: Aajay Sharma (admin@captainpizza.com / admin123)');
         } else {
-            console.log('☑️ Admin account already exists. Skipping admin seed.');
+            // Update name to Aajay Sharma
+            adminExists.name = 'Aajay Sharma';
+            await adminExists.save();
+            console.log('☑️ Admin name verified as Aajay Sharma.');
         }
 
         const staffEmail = 'staff@captainpizza.com';

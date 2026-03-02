@@ -2,6 +2,7 @@ import express from 'express';
 import Order from '../models/Order.js';
 import Coupon from '../models/Coupon.js';
 import Setting from '../models/Setting.js';
+import User from '../models/User.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -12,6 +13,7 @@ const router = express.Router();
 router.get('/dashboard', async (req, res) => {
     try {
         const totalOrders = await Order.countDocuments({});
+        const totalUsers = await User.countDocuments({ role: 'customer' });
 
         // Delivered (Complete) Orders
         const completeOrders = await Order.countDocuments({ status: 'delivered' });
@@ -66,6 +68,7 @@ router.get('/dashboard', async (req, res) => {
             success: true,
             data: {
                 totalOrders,
+                totalUsers,
                 completeOrders,
                 cancelledOrders,
                 totalRevenue,
