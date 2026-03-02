@@ -162,11 +162,11 @@ export const login = async (req, res) => {
             expiresIn: '30d'
         });
 
-        // Set HttpOnly Cookie
+        // Set HttpOnly Cookie (Cross-Domain Fix)
         res.cookie('token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
-            sameSite: 'strict', // CSRF protection
+            secure: true, // MANDATORY for sameSite: 'none'
+            sameSite: 'none', // Needed for different domains (Render vs Hostinger)
             maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
         });
 
@@ -254,11 +254,11 @@ export const verifyOtp = async (req, res) => {
             expiresIn: '30d'
         });
 
-        // Set HttpOnly Cookie
+        // Set HttpOnly Cookie (Cross-Domain Fix)
         res.cookie('token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            secure: true,
+            sameSite: 'none',
             maxAge: 30 * 24 * 60 * 60 * 1000
         });
 
@@ -523,14 +523,13 @@ export const getMe = async (req, res) => {
 };
 
 // @desc    Logout user & clear cookie
-// @route   POST /api/auth/logout
 export const logout = async (req, res) => {
     try {
         res.cookie('token', '', {
             httpOnly: true,
-            expires: new Date(0), // Immediate expiration
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax'
+            expires: new Date(0),
+            secure: true,
+            sameSite: 'none'
         });
         res.status(200).json({ success: true, message: 'Logged out successfully.' });
     } catch (error) {
