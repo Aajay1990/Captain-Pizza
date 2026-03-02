@@ -10,27 +10,30 @@ const sendEmail = async (options) => {
         return { success: true, mock: true };
     }
 
-    // Clean up credentials (STRIP SPACES AUTOMATICALLY)
-    const user = process.env.SMTP_USER?.trim().replace(/\s/g, '');
-    const pass = process.env.SMTP_PASS?.trim().replace(/\s/g, '');
+    const host = process.env.SMTP_HOST?.trim();
+    const port = parseInt(process.env.SMTP_PORT?.trim()) || 587;
+    const user = process.env.SMTP_USER?.trim();
+    const pass = process.env.SMTP_PASS?.trim();
 
-    console.log(`[ULTIMATE ATTEMPT] Sending to: ${options.email} via Gmail Service...`);
+    console.log(`[PROFESSIONAL SMTP] Sending via ${host}:${port}...`);
 
-    // The simplest and most reliable way for Gmail on Render
     const transporter = nodemailer.createTransport({
-        service: 'gmail',
+        host: host,
+        port: port,
+        secure: (port === 465), // False for 587 (STARTTLS)
         auth: {
             user: user,
             pass: pass
         },
+        connectionTimeout: 20000,
         tls: {
-            // This is key for cloud servers to avoid handshake errors
+            // Essential for successful connection from cloud environments
             rejectUnauthorized: false
         }
     });
 
     const mailOptions = {
-        from: `"Captain Pizza" <${user}>`, // MUST match the auth user
+        from: `"Captain Pizza" <${user}>`,
         to: options.email,
         subject: options.subject,
         text: options.message,
@@ -39,10 +42,10 @@ const sendEmail = async (options) => {
 
     try {
         const info = await transporter.sendMail(mailOptions);
-        console.log(`[EMAIL SUCCESS] OTP sent to ${options.email}`);
+        console.log(`[EMAIL DISPATCHED] ID: ${info.messageId}`);
         return { success: true, messageId: info.messageId };
     } catch (err) {
-        console.error(`[EMAIL ERROR] Detailed Error: ${err.message}`);
+        console.error(`[SMTP ERROR] ${err.message}`);
         return { success: false, error: err.message };
     }
 };
