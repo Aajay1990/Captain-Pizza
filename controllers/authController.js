@@ -162,10 +162,17 @@ export const login = async (req, res) => {
             expiresIn: '30d'
         });
 
+        // Set HttpOnly Cookie
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
+            sameSite: 'strict', // CSRF protection
+            maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+        });
+
         res.json({
             success: true,
             message: 'Login successful.',
-            token,
             user: { _id: user._id, name: user.name, email: user.email, role: user.role, hasUsedWelcomeOffer: user.hasUsedWelcomeOffer }
         });
 
@@ -247,10 +254,17 @@ export const verifyOtp = async (req, res) => {
             expiresIn: '30d'
         });
 
+        // Set HttpOnly Cookie
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 30 * 24 * 60 * 60 * 1000
+        });
+
         res.json({
             success: true,
             message: 'OTP Login successful.',
-            token,
             user: { _id: user._id, email: user.email, role: user.role, hasUsedWelcomeOffer: user.hasUsedWelcomeOffer }
         });
     } catch (error) {
@@ -491,5 +505,35 @@ export const adminGuestLogin = async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Error granting guest access.' });
+    }
+};
+
+// @desc    Get current user profile (Verify token from cookie)
+// @route   GET /api/auth/me
+export const getMe = async (req, res) => {
+    try {
+        // req.user is set by 'protect' middleware after verifying the cookie
+        if (!req.user) {
+            return res.status(401).json({ success: false, message: 'User not found.' });
+        }
+        res.status(200).json({ success: true, user: req.user });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error retrieving your session.' });
+    }
+};
+
+// @desc    Logout user & clear cookie
+// @route   POST /api/auth/logout
+export const logout = async (req, res) => {
+    try {
+        res.cookie('token', '', {
+            httpOnly: true,
+            expires: new Date(0), // Immediate expiration
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax'
+        });
+        res.status(200).json({ success: true, message: 'Logged out successfully.' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Logout failed.' });
     }
 };
