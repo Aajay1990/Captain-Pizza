@@ -1,52 +1,39 @@
-import nodemailer from 'nodemailer';
+import axios from 'axios';
 
 const sendEmail = async (options) => {
-    // If no SMTP settings, simulation mode
-    if (!process.env.SMTP_USER || !process.env.SMTP_PASS || !process.env.SMTP_HOST) {
+    // If no API Key, use simulation mode
+    const apiKey = process.env.BREVO_API_KEY?.trim();
+    const senderEmail = process.env.SMTP_USER?.trim();
+
+    if (!apiKey) {
         console.log("-----------------------------------------");
-        console.log(`[EMAIL SIMULATION] To: ${options.email}`);
-        console.log(`[EMAIL SIMULATION] Message: ${options.message}`);
+        console.log("!!! BREVO_API_KEY NOT FOUND. SIMULATING EMAIL !!!");
+        console.log(`[SIMULATION] To: ${options.email} | Subject: ${options.subject}`);
         console.log("-----------------------------------------");
         return { success: true, mock: true };
     }
 
-    const host = process.env.SMTP_HOST?.trim();
-    const port = parseInt(process.env.SMTP_PORT?.trim()) || 587;
-    const user = process.env.SMTP_USER?.trim();
-    const pass = process.env.SMTP_PASS?.trim();
-
-    console.log(`[PROFESSIONAL SMTP] Sending via ${host}:${port}...`);
-
-    const transporter = nodemailer.createTransport({
-        host: host,
-        port: port,
-        secure: (port === 465), // False for 587 (STARTTLS)
-        auth: {
-            user: user,
-            pass: pass
-        },
-        connectionTimeout: 20000,
-        tls: {
-            // Essential for successful connection from cloud environments
-            rejectUnauthorized: false
-        }
-    });
-
-    const mailOptions = {
-        from: `"Captain Pizza" <${user}>`,
-        to: options.email,
-        subject: options.subject,
-        text: options.message,
-        html: options.html
-    };
+    console.log(`[BREVO API ATTEMPT] Sending to: ${options.email}...`);
 
     try {
-        const info = await transporter.sendMail(mailOptions);
-        console.log(`[EMAIL DISPATCHED] ID: ${info.messageId}`);
-        return { success: true, messageId: info.messageId };
+        const response = await axios.post('https://api.brevo.com/v3/smtp/email', {
+            sender: { name: "Captain Pizza", email: senderEmail || "noreply@captainpizza.com" },
+            to: [{ email: options.email }],
+            subject: options.subject,
+            htmlContent: options.html || options.message
+        }, {
+            headers: {
+                'api-key': apiKey,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        console.log(`[BREVO API SUCCESS] Message ID: ${response.data.messageId}`);
+        return { success: true, messageId: response.data.messageId };
     } catch (err) {
-        console.error(`[SMTP ERROR] ${err.message}`);
-        return { success: false, error: err.message };
+        const errorMsg = err.response?.data?.message || err.message;
+        console.error(`[BREVO API CRITICAL ERROR] ${errorMsg}`);
+        return { success: false, error: errorMsg };
     }
 };
 
