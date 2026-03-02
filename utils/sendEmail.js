@@ -10,39 +10,54 @@ const sendEmail = async (options) => {
         return { success: true, mock: true };
     }
 
-    // Use Port 587 with secure: false for better compatibility on Render/Cloud
-    const isSecure = process.env.SMTP_PORT == '465';
+    // Ensure values are clean
+    const host = process.env.SMTP_HOST?.trim();
+    const port = parseInt(process.env.SMTP_PORT?.trim()) || 587;
+    const user = process.env.SMTP_USER?.trim();
+    const pass = process.env.SMTP_PASS?.trim();
+
+    // Use Port 465 for SSL, others for STARTTLS (secure: false)
+    const isSecure = port === 465;
+
+    console.log(`[EMAIL ATTEMPT] Preparing to send to ${options.email} via ${host}:${port} (Secure: ${isSecure})`);
 
     const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: parseInt(process.env.SMTP_PORT) || 587,
+        host: host,
+        port: port,
         secure: isSecure,
         auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS
+            user: user,
+            pass: pass
         },
-        connectionTimeout: 10000, // 10 seconds timeout
+        connectionTimeout: 15000, // 15 seconds
+        greetingTimeout: 15000,
+        socketTimeout: 30000,
         tls: {
-            rejectUnauthorized: false // Helps with some shared hosting connection issues
-        }
+            rejectUnauthorized: false, // Essential for many shared/cloud hosts
+            minVersion: 'TLSv1.2'
+        },
+        debug: true, // Enable internal logging
+        logger: true
     });
 
     const mailOptions = {
-        from: `"Captain Pizza" <${process.env.SMTP_USER}>`,
+        from: `"Captain Pizza" <${user}>`, // Must match SMTP user for many providers
         to: options.email,
         subject: options.subject,
         text: options.message,
-        html: options.html // Added HTML support
+        html: options.html
     };
 
     try {
         const info = await transporter.sendMail(mailOptions);
-        console.log(`[EMAIL SENT] to ${options.email}`);
-        return info;
+        console.log(`[EMAIL SUCCESS] Message ID: ${info.messageId} sent to ${options.email}`);
+        return { success: true, messageId: info.messageId };
     } catch (err) {
-        console.error(`[EMAIL ERROR] Connection failed: ${err.message}`);
-        // We don't throw error here to prevent blocking the user flow (they can use Master OTP)
-        return { success: false, error: err.message };
+        console.error(`[EMAIL CRITICAL ERROR] Destination: ${options.email} | Error: ${err.message}`);
+        console.error(`[SMT DETAILS] Host: ${host}, User: ${user}, Port: ${port}`);
+
+        // This time, we return the full error so we can debug it via API
+        return { success: false, error: err.message, stack: err.stack };
     }
 };
 

@@ -1,5 +1,5 @@
 import express from 'express';
-import { register, login, verifyEmail, getAllUsers, sendOtp, verifyOtp, deleteUser, resendVerificationCode, forgotPassword, resetPassword } from '../controllers/authController.js';
+import { register, login, verifyEmail, getAllUsers, sendOtp, verifyOtp, deleteUser, resendVerificationCode, forgotPassword, resetPassword, testEmail } from '../controllers/authController.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -16,5 +16,8 @@ router.post('/verify-otp', verifyOtp);
 router.post('/resend-verification-code', resendVerificationCode);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
+
+// Diagnostic test (public so user can check anytime via URL/Postman)
+router.post('/test-email', testEmail);
 
 export default router;

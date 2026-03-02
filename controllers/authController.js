@@ -383,3 +383,35 @@ export const resetPassword = async (req, res) => {
         res.status(500).json({ success: false, message: 'Error resetting password.' });
     }
 };
+// @desc    Diagnostic route to test SMTP connectivity
+// @route   POST /api/auth/test-email
+export const testEmail = async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) return res.status(400).json({ success: false, message: 'Destination email is required' });
+
+        console.log(`[DIAGNOSTIC] Testing connection for ${email}...`);
+
+        const result = await sendEmail({
+            email: email,
+            subject: 'Diagnostic Test - Captain Pizza',
+            message: 'If you see this, your SMTP configuration is working perfectly!',
+            html: '<h1>Connection Successful!</h1><p>Captain Pizza SMTP is live.</p>'
+        });
+
+        if (result.success) {
+            res.json({ success: true, message: 'Test email sent successfully! Check your inbox/spam.', details: result });
+        } else {
+            res.status(500).json({
+                success: false,
+                message: 'SMTP Connection failed. Check the error below.',
+                error: result.error,
+                host: process.env.SMTP_HOST,
+                user: process.env.SMTP_USER,
+                port: process.env.SMTP_PORT
+            });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error during test.', error: error.message });
+    }
+};
