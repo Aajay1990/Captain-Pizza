@@ -400,7 +400,13 @@ export const testEmail = async (req, res) => {
         });
 
         if (result.success) {
-            res.json({ success: true, message: 'Test email sent successfully! Check your inbox/spam.', details: result });
+            const isMock = result.mock === true;
+            res.json({
+                success: true,
+                message: isMock ? 'WARNING: Simulation Mode! No real email sent. Check Render Environment Variables for BREVO_API_KEY.' : 'Test email sent successfully! Check your inbox/spam.',
+                details: result,
+                mode: isMock ? 'SIMULATION' : 'PRODUCTION'
+            });
         } else {
             res.status(500).json({
                 success: false,
