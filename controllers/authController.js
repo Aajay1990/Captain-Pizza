@@ -11,6 +11,15 @@ export const register = async (req, res) => {
         const { name, email, password } = req.body;
         const normalizedEmail = email.trim().toLowerCase();
 
+        // Strong Password Validation: Min 6 chars, Upper, Lower, Special
+        const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).{6,}$/;
+        if (!strongPasswordRegex.test(password)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Password must be at least 6 characters and include uppercase, lowercase, and a special symbol.'
+            });
+        }
+
         // Check if user already exists
         const userExists = await User.findOne({ email: normalizedEmail });
 
@@ -365,6 +374,15 @@ export const resetPassword = async (req, res) => {
         const { email, otp, newPassword } = req.body;
         const normalizedEmail = email.trim().toLowerCase();
 
+        // Strong Password Validation
+        const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).{6,}$/;
+        if (!strongPasswordRegex.test(newPassword)) {
+            return res.status(400).json({
+                success: false,
+                message: 'New password must be at least 6 characters and include uppercase, lowercase, and a special symbol.'
+            });
+        }
+
         const user = await User.findOne({
             email: normalizedEmail,
             verificationToken: otp
@@ -419,5 +437,59 @@ export const testEmail = async (req, res) => {
         }
     } catch (error) {
         res.status(500).json({ success: false, message: 'Server error during test.', error: error.message });
+    }
+};
+
+// @desc    Update any user password (Admin only)
+// @route   PUT /api/auth/users/:id/password
+export const updateUserPassword = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { newPassword } = req.body;
+
+        // Validation
+        const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).{6,}$/;
+        if (!strongPasswordRegex.test(newPassword)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Password must be at least 6 characters and include uppercase, lowercase, and a special symbol.'
+            });
+        }
+
+        const user = await User.findById(id);
+        if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(newPassword, salt);
+        await user.save();
+
+        res.json({ success: true, message: `Password for ${user.email} updated successfully.` });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Error updating password.' });
+    }
+};
+
+// @desc    Admin Guest Login for POS (No password required for Admin)
+// @route   POST /api/auth/admin-pos-access
+export const adminGuestLogin = async (req, res) => {
+    try {
+        // req.user comes from protect middleware
+        if (!req.user || req.user.role !== 'admin') {
+            return res.status(403).json({ success: false, message: 'Only admins can use guest access.' });
+        }
+
+        // We generate a "POS Session" token for the admin
+        const token = jwt.sign({ id: req.user._id, role: 'admin' }, process.env.JWT_SECRET || 'fallback_secret_for_dev_captain_pizza', {
+            expiresIn: '4h' // Short lived for guest session
+        });
+
+        res.json({
+            success: true,
+            message: 'Admin POS Guest Access Granted.',
+            token,
+            user: { _id: req.user._id, name: req.user.name + " (Admin Session)", email: req.user.email, role: 'admin' }
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Error granting guest access.' });
     }
 };
