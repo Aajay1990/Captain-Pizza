@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
     name: { type: String },
-    email: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     password: { type: String, required: false }, // Made false for OTP only users
     phone: { type: String, unique: true, sparse: true }, // For OTP/SMS features
     role: { type: String, enum: ['customer', 'admin', 'staff'], default: 'customer' },
