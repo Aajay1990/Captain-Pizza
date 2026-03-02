@@ -10,30 +10,27 @@ const sendEmail = async (options) => {
         return { success: true, mock: true };
     }
 
-    const user = process.env.SMTP_USER?.trim();
-    const pass = process.env.SMTP_PASS?.trim();
+    // Clean up credentials (STRIP SPACES AUTOMATICALLY)
+    const user = process.env.SMTP_USER?.trim().replace(/\s/g, '');
+    const pass = process.env.SMTP_PASS?.trim().replace(/\s/g, '');
 
-    console.log(`[ULTIMATE SMTP ATTEMPT] Target: ${options.email} via Port 465 (Pool Enabled)`);
+    console.log(`[ULTIMATE ATTEMPT] Sending to: ${options.email} via Gmail Service...`);
 
+    // The simplest and most reliable way for Gmail on Render
     const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 465,
-        secure: true, // MUST be true for port 465
-        pool: true,   // Use connection pooling to avoid frequent handshakes
+        service: 'gmail',
         auth: {
             user: user,
             pass: pass
         },
-        connectionTimeout: 30000,
-        greetingTimeout: 30000,
-        socketTimeout: 45000,
         tls: {
+            // This is key for cloud servers to avoid handshake errors
             rejectUnauthorized: false
         }
     });
 
     const mailOptions = {
-        from: `"Captain Pizza" <${user}>`,
+        from: `"Captain Pizza" <${user}>`, // MUST match the auth user
         to: options.email,
         subject: options.subject,
         text: options.message,
@@ -42,10 +39,10 @@ const sendEmail = async (options) => {
 
     try {
         const info = await transporter.sendMail(mailOptions);
-        console.log(`[EMAIL SUCCESS] OTP delivered to ${options.email}`);
+        console.log(`[EMAIL SUCCESS] OTP sent to ${options.email}`);
         return { success: true, messageId: info.messageId };
     } catch (err) {
-        console.error(`[EMAIL ERROR] Critical Failure: ${err.message}`);
+        console.error(`[EMAIL ERROR] Detailed Error: ${err.message}`);
         return { success: false, error: err.message };
     }
 };
