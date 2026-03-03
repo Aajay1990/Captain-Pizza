@@ -13,5 +13,6 @@ router.post('/razorpay/verify', verifyRazorpayPayment);
 
 // Order Retrieval endpoint mapped GET
 router.get('/', getOrders);
+router.put('/:id/status', updateOrderStatus);
 
 export default router;
