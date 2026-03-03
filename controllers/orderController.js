@@ -165,7 +165,7 @@ export const verifyRazorpayPayment = async (req, res) => {
             } = orderData;
 
             const newOrder = new Order({
-                user: userId || null,
+                user: (userId && mongoose.Types.ObjectId.isValid(userId)) ? userId : null,
                 customerInfo: customerInfo || { name: 'Walk-in Customer', phone: '0000000000' },
                 orderItems,
                 discount: discount || 0,
