@@ -11,6 +11,7 @@ import userRoutes from './routes/userRoutes.js';
 import reviewRoutes from './routes/reviewRoutes.js';
 import toppingRoutes from './routes/toppingRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
+import offerRoutes from './routes/offerRoutes.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import seedAdmin from './utils/seedAdmin.js';

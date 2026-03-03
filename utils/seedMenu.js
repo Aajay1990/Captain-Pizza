@@ -94,8 +94,8 @@ const menuData = {
         { id: "bv11", name: "Watermelon", desc: "", image: "WATERMELON .png", price: 70 },
         { id: "bv12", name: "Lemon Ice Tea", desc: "", image: "LEAMON ICE TEA.png", price: 80 }
     ],
-    cheapMeals: [
-        { id: "cm1", name: "Buy 1 Get 1 FREE", desc: "On Medium & Large Pizza (Wednesdays & Fridays only)", image: "Buy 1 Get 1 FREE.png", price: 340 },
+    specialOffers: [
+        { id: "cm1", name: "Buy 1 Get 1 FREE", desc: "Choose 1 from Deluxe Veg (Med/Large) & Get 1 from Supreme Veg (Med/Large) Free!", image: "Buy 1 Get 1 FREE.png", price: 340 },
         { id: "cm2", name: "Super Value Friends Meal", desc: "1 Aloo Tikki Burger + Small French Fries + Coke (250ml)", image: "Super Value Friends Meal.png", price: 100 },
         { id: "cm3", name: "Family Combo", desc: "1 Medium Pizza + 2 Burgers + Coke (250ml)", image: "Family Combo.png", price: 340 }
     ]
@@ -131,7 +131,7 @@ const seedMenu = async () => {
         menuData.sandwiches.forEach(item => documents.push({ name: item.name, category: 'sandwich', desc: item.desc, image: item.image, price: item.price }));
         menuData.sides.forEach(item => documents.push({ name: item.name, category: 'side', desc: item.desc, image: item.image, price: item.price }));
         menuData.beverages.forEach(item => documents.push({ name: item.name, category: 'beverage', desc: item.desc, image: item.image, price: item.price }));
-        menuData.cheapMeals.forEach(item => documents.push({ name: item.name, category: 'cheapMeal', desc: item.desc, image: item.image, price: item.price }));
+        menuData.specialOffers.forEach(item => documents.push({ name: item.name, category: 'specialOffer', desc: item.desc, image: item.image, price: item.price }));
 
         await MenuItem.insertMany(documents);
         console.log("Menu seeded successfully!");

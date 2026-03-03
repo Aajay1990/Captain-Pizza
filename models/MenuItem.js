@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const menuItemSchema = new mongoose.Schema({
     name: { type: String, required: true },
-    category: { type: String, required: true }, // e.g., 'Pizza', 'Burger', 'Wrap', 'Cheap Meal', etc.
+    category: { type: String, required: true }, // e.g., 'Pizza', 'Burger', 'Wrap', 'Special Offer', etc.
     subCategory: { type: String }, // e.g., 'Simple Veg', 'Classic Veg' for pizzas
     desc: { type: String },
     image: { type: String }, // URL or filename path

@@ -3,9 +3,56 @@ import Order from '../models/Order.js';
 import Coupon from '../models/Coupon.js';
 import Setting from '../models/Setting.js';
 import User from '../models/User.js';
+import SeasonalOffer from '../models/SeasonalOffer.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
+
+// @desc    Get all seasonal offers
+// @route   GET /api/admin/offers
+router.get('/offers', protect, admin, async (req, res) => {
+    try {
+        const offers = await SeasonalOffer.find({}).sort({ createdAt: -1 });
+        res.status(200).json({ success: true, data: offers });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Error retrieving offers' });
+    }
+});
+
+// @desc    Create a new seasonal offer
+// @route   POST /api/admin/offers
+router.post('/offers', protect, admin, async (req, res) => {
+    try {
+        const offer = await SeasonalOffer.create(req.body);
+        res.status(201).json({ success: true, data: offer });
+    } catch (error) {
+        res.status(400).json({ success: false, message: 'Error creating offer', error: error.message });
+    }
+});
+
+// @desc    Update a seasonal offer
+// @route   PUT /api/admin/offers/:id
+router.put('/offers/:id', protect, admin, async (req, res) => {
+    try {
+        const offer = await SeasonalOffer.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!offer) return res.status(404).json({ success: false, message: 'Offer not found' });
+        res.status(200).json({ success: true, data: offer });
+    } catch (error) {
+        res.status(400).json({ success: false, message: 'Error updating offer' });
+    }
+});
+
+// @desc    Delete a seasonal offer
+// @route   DELETE /api/admin/offers/:id
+router.delete('/offers/:id', protect, admin, async (req, res) => {
+    try {
+        const offer = await SeasonalOffer.findByIdAndDelete(req.params.id);
+        if (!offer) return res.status(404).json({ success: false, message: 'Offer not found' });
+        res.status(200).json({ success: true, message: 'Offer deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Error deleting offer' });
+    }
+});
 
 // @desc    Get Admin Dashboard Stats
 // @route   GET /api/admin/dashboard
@@ -138,8 +185,75 @@ router.delete('/coupons/:id', async (req, res) => {
 router.post('/coupons/validate', async (req, res) => {
     try {
         const { code, orderTotal } = req.body;
+        const upperCode = code.toUpperCase();
 
-        const coupon = await Coupon.findOne({ code: code.toUpperCase(), isActive: true });
+        // 1. Check for Dynamic "WELCOME" Coupon
+        if (upperCode.startsWith('WELCOME')) {
+            const discountSetting = await Setting.findOne({ key: 'new_user_discount' });
+            const currentDiscount = discountSetting ? Number(discountSetting.value) : 20;
+            const expectedCode = `WELCOME${currentDiscount}`;
+
+            if (upperCode === expectedCode) {
+                const discountAmount = (orderTotal * currentDiscount) / 100;
+                return res.status(200).json({
+                    success: true,
+                    discount: discountAmount,
+                    message: `Welcome Offer Applied (${currentDiscount}%)!`
+                });
+            }
+        }
+
+        // 2. Check for Seasonal Offer Coupon (From Settings)
+        const sCoupon = await Setting.findOne({ key: 'seasonal_offer_coupon' });
+        if (sCoupon && upperCode === sCoupon.value.toString().toUpperCase()) {
+            const sEnabled = await Setting.findOne({ key: 'seasonal_offer_enabled' });
+            if (sEnabled && sEnabled.value === 'true') {
+                const sMinOrder = await Setting.findOne({ key: 'seasonal_offer_min_order' });
+                const minVal = sMinOrder ? Number(sMinOrder.value) : 0;
+
+                if (orderTotal < minVal) {
+                    return res.status(400).json({ success: false, message: `Seasonal offer requires min order of ₹${minVal}` });
+                }
+
+                const sDisc = await Setting.findOne({ key: 'seasonal_offer_discount' });
+                const sType = await Setting.findOne({ key: 'seasonal_offer_discount_type' });
+
+                const dVal = sDisc ? Number(sDisc.value) : 15;
+                const dType = sType ? sType.value : 'PERCENT';
+
+                let discount = 0;
+                if (dType === 'AMOUNT') {
+                    discount = dVal;
+                } else {
+                    discount = (orderTotal * dVal) / 100;
+                }
+
+                return res.status(200).json({ success: true, discount, message: 'Seasonal Offer Applied!' });
+            }
+        }
+
+        // 3. Check for dynamic Active Seasonal Offers with couponCode attached
+        const currentDate = new Date();
+        const activeSeasonalOffer = await SeasonalOffer.findOne({
+            couponCode: upperCode,
+            isActive: true,
+            startDate: { $lte: currentDate },
+            endDate: { $gte: currentDate }
+        });
+
+        if (activeSeasonalOffer) {
+            let discount = 0;
+            if (activeSeasonalOffer.discountType === 'AMOUNT') {
+                discount = activeSeasonalOffer.discountValue;
+            } else {
+                discount = (orderTotal * activeSeasonalOffer.discountValue) / 100;
+            }
+            return res.status(200).json({ success: true, discount, message: 'Seasonal Offer Applied!' });
+        }
+
+
+        // 4. Check for Static Coupons in Database
+        const coupon = await Coupon.findOne({ code: upperCode, isActive: true });
 
         if (!coupon) {
             return res.status(400).json({ success: false, message: 'Invalid or expired coupon code' });
@@ -159,6 +273,7 @@ router.post('/coupons/validate', async (req, res) => {
         res.status(200).json({ success: true, discount, message: 'Coupon Applied!' });
 
     } catch (error) {
+        console.error("Coupon Validate Error:", error);
         res.status(500).json({ success: false, message: 'Error validating coupon' });
     }
 });

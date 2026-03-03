@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const orderItemSchema = new mongoose.Schema({
-    menuItem: { type: mongoose.Schema.Types.ObjectId, ref: 'MenuItem', required: true },
+    menuItem: { type: String, required: true },
     name: { type: String, required: true },
     quantity: { type: Number, required: true },
     size: { type: String }, // 'small', 'medium', 'large' for pizzas, 'regular' for others
