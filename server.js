@@ -17,54 +17,72 @@ import { fileURLToPath } from 'url';
 import seedAdmin from './utils/seedAdmin.js';
 import seedMenu from './utils/seedMenu.js';
 import seedReviews from './utils/seedReviews.js';
+import http from 'http';
 
-// Initialize environment variables mapping
 dotenv.config();
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Middleware
-app.use(express.json());
+// ── Middleware ────────────────────────────────────────────────────────────────
+app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
 
-// Production CORS setup - Allow credentials for HttpOnly cookies
+// Allowed frontend origins (Hostinger + local dev + Vercel/Netlify previews)
+const ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'https://captainpizza.in',
+    'https://www.captainpizza.in',
+    'http://captainpizza.in',
+    'http://www.captainpizza.in',
+];
+
 app.use(cors({
-    origin: true, // Automatically reflect the request origin
-    credentials: true // MANDATORY for HttpOnly cookies
+    origin: (origin, callback) => {
+        // allow curl / Postman / server-to-server with no origin
+        if (!origin) return callback(null, true);
+        // allow any *.hostingersite.com preview or *.onrender.com
+        if (
+            ALLOWED_ORIGINS.includes(origin) ||
+            /hostingersite\.com$/i.test(origin) ||
+            /netlify\.app$/i.test(origin) ||
+            /vercel\.app$/i.test(origin) ||
+            /onrender\.com$/i.test(origin)
+        ) {
+            return callback(null, true);
+        }
+        return callback(null, true); // Allow all for now – tighten later
+    },
+    credentials: true
 }));
 
 // Serve uploaded static files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Database Connection
+// ── Database Connection ───────────────────────────────────────────────────────
 const connectDB = async () => {
     try {
         if (!process.env.MONGO_URI) {
-            console.error('FATAL ERROR: MONGO_URI is not defined in environment variables.');
+            console.error('FATAL: MONGO_URI not defined.');
             process.exit(1);
         }
-
         await mongoose.connect(process.env.MONGO_URI, {
             family: 4,
-            serverSelectionTimeoutMS: 5000
+            serverSelectionTimeoutMS: 10000
         });
-        console.log('Database Connected Successfully to production URI');
-
-        // Seed initial admin user if not exists
+        console.log('✅ Database Connected');
         await seedAdmin();
-        // Seed default menu if DB is empty for in-memory DB or first run
         await seedMenu();
-        // Seed initial reviews if DB is empty
         await seedReviews();
     } catch (err) {
-        console.error('Database connection failed', err);
+        console.error('❌ Database connection failed', err.message);
     }
 };
 connectDB();
 
-// Routes
+// ── Routes ────────────────────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/admin', adminRoutes);
@@ -73,13 +91,40 @@ app.use('/api/users', userRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/toppings', toppingRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/offers', offerRoutes);
+
+// Health check endpoint (used by keep-alive ping)
+app.get('/health', (req, res) => res.json({ status: 'ok', time: new Date().toISOString() }));
 
 app.get('/', (req, res) => {
-    res.send('API is running for Captain Pizza...');
+    res.send('🍕 Captain Pizza API is running!');
 });
 
-// Setting server to listen
+// ── Server ────────────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`Server running in development mode on port ${PORT}`);
+    console.log(`🚀 Server running on port ${PORT}`);
 });
+
+// ── Keep-Alive Ping (prevents Render free tier from sleeping) ─────────────────
+// Pings self every 14 minutes so the server stays warm
+const SELF_URL = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
+setInterval(() => {
+    try {
+        const url = new URL(`${SELF_URL}/health`);
+        const options = {
+            hostname: url.hostname,
+            port: url.port || (url.protocol === 'https:' ? 443 : 80),
+            path: '/health',
+            method: 'GET',
+            timeout: 10000
+        };
+        const reqPing = http.request(options, (res) => {
+            console.log(`🏓 Keep-alive ping: ${res.statusCode}`);
+        });
+        reqPing.on('error', (e) => console.error('Keep-alive error:', e.message));
+        reqPing.end();
+    } catch (e) {
+        console.error('Keep-alive failed:', e.message);
+    }
+}, 14 * 60 * 1000); // every 14 minutes

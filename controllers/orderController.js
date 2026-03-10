@@ -27,6 +27,13 @@ export const createOrder = async (req, res) => {
             return res.status(400).json({ success: false, message: 'No order items' });
         }
 
+        // Validate 10-digit phone number for delivery orders
+        const phoneRaw = customerInfo?.phone || '';
+        const phoneDigits = phoneRaw.replace(/\D/g, '');
+        if (orderType === 'delivery' && phoneDigits.length !== 10) {
+            return res.status(400).json({ success: false, message: 'Mobile number must be exactly 10 digits long.' });
+        }
+
         // Default customer info if missing (especially for POS)
         const finalCustomerInfo = {
             name: customerInfo?.name || 'Walk-in Customer',
@@ -151,7 +158,6 @@ export const verifyRazorpayPayment = async (req, res) => {
         const isAuthentic = expectedSignature === razorpay_signature;
 
         if (isAuthentic) {
-            // Save the order to the database
             const {
                 customerInfo,
                 orderItems,
@@ -163,6 +169,13 @@ export const verifyRazorpayPayment = async (req, res) => {
                 tax,
                 subTotal
             } = orderData;
+
+            // Validate 10-digit phone number for delivery orders
+            const phoneRaw = customerInfo?.phone || '';
+            const phoneDigits = phoneRaw.replace(/\D/g, '');
+            if (orderType === 'delivery' && phoneDigits.length !== 10) {
+                return res.status(400).json({ success: false, message: 'Mobile number must be exactly 10 digits long.' });
+            }
 
             const newOrder = new Order({
                 user: (userId && mongoose.Types.ObjectId.isValid(userId)) ? userId : null,

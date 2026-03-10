@@ -67,3 +67,19 @@ export const deleteMenuItem = async (req, res) => {
         res.status(500).json({ success: false, message: 'Server error deleting menu item' });
     }
 };
+// @desc    Update all items in a category (Rename category)
+// @route   PUT /api/menu/category/rename
+// @access  Private/Admin
+export const updateCategoryName = async (req, res) => {
+    try {
+        const { oldName, newName } = req.body;
+        if (!oldName || !newName) {
+            return res.status(400).json({ success: false, message: 'Both old and new category names are required' });
+        }
+        const result = await MenuItem.updateMany({ category: oldName }, { category: newName });
+        res.status(200).json({ success: true, message: `Successfully updated ${result.modifiedCount} items from "${oldName}" to "${newName}"` });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+};
