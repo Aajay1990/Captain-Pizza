@@ -61,25 +61,41 @@ app.use(cors({
 // Serve uploaded static files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// ── Database Connection ───────────────────────────────────────────────────────
+// ── Server Start (Immediate for Render) ──────────────────────────────────────
+const PORT = process.env.PORT || 5000;
+const server = app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Server is LIVE on port ${PORT}`);
+    console.log(`📡 URL: ${process.env.RENDER_EXTERNAL_URL || 'Localhost'}`);
+});
+
+// ── Database Connection (Background) ──────────────────────────────────────────
 const connectDB = async () => {
     try {
         if (!process.env.MONGO_URI) {
-            console.error('FATAL: MONGO_URI not defined.');
-            process.exit(1);
+            console.error('⚠️ WARNING: MONGO_URI not defined in environment variables.');
+            return;
         }
+        console.log('⏳ Connecting to MongoDB...');
         await mongoose.connect(process.env.MONGO_URI, {
             family: 4,
-            serverSelectionTimeoutMS: 10000
+            serverSelectionTimeoutMS: 15000
         });
-        console.log('✅ Database Connected');
-        await seedAdmin();
-        await seedMenu();
-        await seedReviews();
+        console.log('✅ Database Connected Successfully');
+        
+        // Seed initial data
+        try {
+            await seedAdmin();
+            await seedMenu();
+            // Removed legacy review seeding
+        } catch (seedErr) {
+            console.warn('⚠️ Seeding skipped or partially failed:', seedErr.message);
+        }
     } catch (err) {
-        console.error('❌ Database connection failed', err.message);
+        console.error('❌ Database connection failed:', err.message);
     }
 };
+
+// Start DB connection in background to not block the port
 connectDB();
 
 // ── Routes ────────────────────────────────────────────────────────────────────
@@ -100,31 +116,15 @@ app.get('/', (req, res) => {
     res.send('🍕 Captain Pizza API is running!');
 });
 
-// ── Server ────────────────────────────────────────────────────────────────────
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-});
-
 // ── Keep-Alive Ping (prevents Render free tier from sleeping) ─────────────────
-// Pings self every 14 minutes so the server stays warm
 const SELF_URL = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
 setInterval(() => {
-    try {
-        const url = new URL(`${SELF_URL}/health`);
-        const options = {
-            hostname: url.hostname,
-            port: url.port || (url.protocol === 'https:' ? 443 : 80),
-            path: '/health',
-            method: 'GET',
-            timeout: 10000
-        };
-        const reqPing = http.request(options, (res) => {
-            console.log(`🏓 Keep-alive ping: ${res.statusCode}`);
-        });
-        reqPing.on('error', (e) => console.error('Keep-alive error:', e.message));
-        reqPing.end();
-    } catch (e) {
-        console.error('Keep-alive failed:', e.message);
-    }
-}, 14 * 60 * 1000); // every 14 minutes
+    const healthUrl = `${SELF_URL}/health`;
+    http.get(healthUrl, (res) => {
+        if (res.statusCode === 200) {
+            console.log(`🏓 Keep-alive ping successful: ${res.statusCode}`);
+        }
+    }).on('error', (err) => {
+        console.error('❌ Keep-alive error:', err.message);
+    });
+}, 14 * 60 * 1000); // 14 minutes

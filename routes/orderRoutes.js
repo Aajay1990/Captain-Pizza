@@ -1,5 +1,5 @@
 import express from 'express';
-import { createOrder, getOrders, updateOrderStatus, createRazorpayOrder, verifyRazorpayPayment, getRazorpayKey } from '../controllers/orderController.js';
+import { createOrder, getOrders, getOrdersByPhone, getOrderById, updateOrderStatus, createRazorpayOrder, verifyRazorpayPayment, getRazorpayKey } from '../controllers/orderController.js';
 
 const router = express.Router();
 
@@ -13,6 +13,8 @@ router.post('/razorpay/verify', verifyRazorpayPayment);
 
 // Order Retrieval endpoint mapped GET
 router.get('/', getOrders);
+router.get('/by-phone/:phone', getOrdersByPhone);
+router.get('/:id', getOrderById);
 router.put('/:id/status', updateOrderStatus);
 
 export default router;

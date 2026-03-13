@@ -86,6 +86,27 @@ export const getOrders = async (req, res) => {
     }
 };
 
+// @desc    Get all orders by customer phone number (No auth required)
+// @route   GET /api/orders/by-phone/:phone
+export const getOrdersByPhone = async (req, res) => {
+    try {
+        const { phone } = req.params;
+        if (!phone || phone.length !== 10) {
+            return res.status(400).json({ success: false, message: 'Invalid phone number format.' });
+        }
+        
+        const orders = await Order.find({ 'customerInfo.phone': phone }).sort({ createdAt: -1 });
+        
+        if (!orders || orders.length === 0) {
+            return res.status(404).json({ success: false, message: 'No orders found for this number.' });
+        }
+        
+        res.status(200).json({ success: true, count: orders.length, orders });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error retrieving orders.', error: error.message });
+    }
+};
+
 // @desc    Update Order Status (For Admin / Kitchen Panel)
 // @route   PUT /api/orders/:id/status
 export const updateOrderStatus = async (req, res) => {
@@ -102,6 +123,38 @@ export const updateOrderStatus = async (req, res) => {
         }
     } catch (error) {
         res.status(500).json({ success: false, message: 'Failed to update order status' });
+    }
+};
+
+// @desc    Get single order by ID (Supports full and partial/short IDs)
+// @route   GET /api/orders/:id
+export const getOrderById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        let order = null;
+
+        // 1. Try exact match if ID looks like a valid 24-char ObjectId
+        if (mongoose.Types.ObjectId.isValid(id)) {
+            order = await Order.findById(id);
+        }
+
+        // 2. Fallback: Search for any order whose _id ends with the input (case-insensitive)
+        if (!order) {
+            // We fetch all recent orders and filter by string - safer than complex regex on _id
+            const recentOrders = await Order.find({}).sort({ createdAt: -1 }).limit(100);
+            order = recentOrders.find(o => 
+                o._id.toString().toUpperCase().endsWith(id.toUpperCase())
+            );
+        }
+
+        if (order) {
+            res.json({ success: true, data: order });
+        } else {
+            res.status(404).json({ success: false, message: 'Order ID not found.' });
+        }
+    } catch (error) {
+        console.error("Tracking error:", error);
+        res.status(500).json({ success: false, message: 'Error retrieving order status.' });
     }
 };
 
