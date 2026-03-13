@@ -12,6 +12,7 @@ const orderItemSchema = new mongoose.Schema({
 const orderSchema = new mongoose.Schema({
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Optional if guest POS order
     staffId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // The staff member who created the order via POS
+    deviceUUID: { type: String }, // For unauthenticated session tracking
     customerInfo: {
         name: { type: String, required: true },
         phone: { type: String, required: true },

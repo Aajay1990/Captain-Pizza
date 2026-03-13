@@ -18,6 +18,7 @@ export const createOrder = async (req, res) => {
             paymentStatus,
             userId,
             staffId,
+            deviceUUID,
             discount,
             tax,
             subTotal
@@ -45,6 +46,7 @@ export const createOrder = async (req, res) => {
         const order = new Order({
             user: (userId && mongoose.Types.ObjectId.isValid(userId)) ? userId : null,
             staffId: (staffId && mongoose.Types.ObjectId.isValid(staffId)) ? staffId : null,
+            deviceUUID: deviceUUID || null,
             customerInfo: finalCustomerInfo,
             orderItems,
             discount: Number(discount) || 0,
@@ -86,22 +88,25 @@ export const getOrders = async (req, res) => {
     }
 };
 
-// @desc    Get all orders by customer phone number (No auth required)
-// @route   GET /api/orders/by-phone/:phone
+// @desc    Get all orders by customer phone number or device ID (No auth required)
+// @route   GET /api/orders/by-phone/:phoneOrDevice
 export const getOrdersByPhone = async (req, res) => {
     try {
-        const { phone } = req.params;
-        if (!phone || phone.length !== 10) {
-            return res.status(400).json({ success: false, message: 'Invalid phone number format.' });
+        const { phone } = req.params; // we keep parameter name 'phone' to avoid changing frontend route, but it can be deviceUUID
+        
+        let query;
+        if (phone.length === 10 && !isNaN(phone)) {
+            // It's likely a phone number, but could also be a short deviceId. We'll search both robustly
+            query = { $or: [{ 'customerInfo.phone': phone }, { deviceUUID: phone }] };
+        } else {
+            // Unlikely to be a phone, definitely a deviceUUID
+            query = { deviceUUID: phone };
         }
         
-        const orders = await Order.find({ 'customerInfo.phone': phone }).sort({ createdAt: -1 });
+        const orders = await Order.find(query).sort({ createdAt: -1 });
         
-        if (!orders || orders.length === 0) {
-            return res.status(404).json({ success: false, message: 'No orders found for this number.' });
-        }
-        
-        res.status(200).json({ success: true, count: orders.length, orders });
+        // Don't 404, just return empty array so frontend is happy
+        res.status(200).json({ success: true, count: orders.length, orders: orders || [] });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Server error retrieving orders.', error: error.message });
     }
@@ -218,6 +223,7 @@ export const verifyRazorpayPayment = async (req, res) => {
                 orderType,
                 paymentMethod,
                 userId,
+                deviceUUID,
                 discount,
                 tax,
                 subTotal
@@ -232,6 +238,7 @@ export const verifyRazorpayPayment = async (req, res) => {
 
             const newOrder = new Order({
                 user: (userId && mongoose.Types.ObjectId.isValid(userId)) ? userId : null,
+                deviceUUID: deviceUUID || null,
                 customerInfo: customerInfo || { name: 'Walk-in Customer', phone: '0000000000' },
                 orderItems,
                 discount: discount || 0,
