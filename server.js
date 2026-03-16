@@ -34,6 +34,12 @@ app.use(cookieParser());
 const ALLOWED_ORIGINS = [
     'http://localhost:5173',
     'http://localhost:3000',
+    // Primary live domain
+    'https://captainpizza.online',
+    'https://www.captainpizza.online',
+    'http://captainpizza.online',
+    'http://www.captainpizza.online',
+    // Legacy / fallback domain
     'https://captainpizza.in',
     'https://www.captainpizza.in',
     'http://captainpizza.in',
