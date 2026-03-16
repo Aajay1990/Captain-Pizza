@@ -12,6 +12,7 @@ import reviewRoutes from './routes/reviewRoutes.js';
 import toppingRoutes from './routes/toppingRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import offerRoutes from './routes/offerRoutes.js';
+import couponRoutes from './routes/couponRoutes.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import seedAdmin from './utils/seedAdmin.js';
@@ -108,6 +109,7 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/toppings', toppingRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/offers', offerRoutes);
+app.use('/api/coupon', couponRoutes);
 
 // Health check endpoint (used by keep-alive ping)
 app.get('/health', (req, res) => res.json({ status: 'ok', time: new Date().toISOString() }));

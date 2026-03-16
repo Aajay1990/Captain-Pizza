@@ -1,6 +1,8 @@
 import express from 'express';
 import Order from '../models/Order.js';
 import Coupon from '../models/Coupon.js';
+import CouponUsage from '../models/CouponUsage.js';
+import CouponApplication from '../models/CouponApplication.js';
 import Setting from '../models/Setting.js';
 import User from '../models/User.js';
 import SeasonalOffer from '../models/SeasonalOffer.js';
@@ -168,15 +170,37 @@ router.put('/coupons/:id', async (req, res) => {
     }
 });
 
-// @desc    Delete a coupon
+// @desc    Delete (or Deactivate) a coupon + all its usage/application records
 // @route   DELETE /api/admin/coupons/:id
 router.delete('/coupons/:id', async (req, res) => {
     try {
         const coupon = await Coupon.findByIdAndDelete(req.params.id);
         if (!coupon) return res.status(404).json({ success: false, message: 'Coupon not found' });
-        res.status(200).json({ success: true, message: 'Coupon deleted successfully' });
+
+        // Clean up all usage / pending records for this coupon code
+        await CouponUsage.deleteMany({ couponCode: coupon.code });
+        await CouponApplication.deleteMany({ couponCode: coupon.code });
+
+        res.status(200).json({ success: true, message: 'Coupon and all usage records deleted successfully' });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Error deleting coupon' });
+    }
+});
+
+// @desc    Deactivate coupon (keep record, clear usage)
+// @route   POST /api/admin/coupons/:id/deactivate
+router.post('/coupons/:id/deactivate', async (req, res) => {
+    try {
+        const coupon = await Coupon.findByIdAndUpdate(req.params.id, { isActive: false }, { new: true });
+        if (!coupon) return res.status(404).json({ success: false, message: 'Coupon not found' });
+
+        // Free up all usage records so the device can potentially reuse a new coupon
+        await CouponUsage.deleteMany({ couponCode: coupon.code });
+        await CouponApplication.deleteMany({ couponCode: coupon.code });
+
+        res.status(200).json({ success: true, message: `Coupon deactivated and usage records cleared.`, data: coupon });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Error deactivating coupon' });
     }
 });
 

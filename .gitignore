@@ -1,3 +1,6 @@
 node_modules/
 .env
-uploads/
+*.log
+*.zip
+seed_temp.js
+pizza-backend-FIXED/
