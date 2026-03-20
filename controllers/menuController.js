@@ -35,8 +35,8 @@ export const updateMenuItem = async (req, res) => {
     try {
         const updatedItem = await MenuItem.findByIdAndUpdate(
             req.params.id,
-            req.body,
-            { new: true, runValidators: true }
+            { $set: req.body },
+            { new: true }
         );
 
         if (!updatedItem) {
@@ -45,7 +45,7 @@ export const updateMenuItem = async (req, res) => {
 
         res.status(200).json({ success: true, data: updatedItem });
     } catch (error) {
-        console.error(error);
+        console.error('Update error:', error);
         res.status(400).json({ success: false, message: 'Could not update menu item', error: error.message });
     }
 };

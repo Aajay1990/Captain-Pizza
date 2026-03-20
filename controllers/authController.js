@@ -173,7 +173,8 @@ export const login = async (req, res) => {
         res.json({
             success: true,
             message: 'Login successful.',
-            user: { _id: user._id, name: user.name, email: user.email, role: user.role, hasUsedWelcomeOffer: user.hasUsedWelcomeOffer }
+            token,
+            user: { _id: user._id, name: user.name, email: user.email, role: user.role, hasUsedWelcomeOffer: user.hasUsedWelcomeOffer, token }
         });
 
     } catch (error) {

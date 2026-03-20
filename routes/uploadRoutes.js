@@ -15,15 +15,20 @@ if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
 
+// Configure storage
 const storage = multer.diskStorage({
     destination(req, file, cb) {
         cb(null, uploadDir);
     },
     filename(req, file, cb) {
-        cb(null, `${Date.now()}_${file.originalname}`);
+        // Sanitize filename and add timestamp
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const ext = path.extname(file.originalname);
+        cb(null, file.fieldname + '-' + uniqueSuffix + ext);
     },
 });
 
+// File filter – allow only images
 function checkFileType(file, cb) {
     const filetypes = /jpg|jpeg|png|webp/;
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
@@ -32,31 +37,52 @@ function checkFileType(file, cb) {
     if (extname && mimetype) {
         return cb(null, true);
     } else {
-        cb(new Error('Images only!'));
+        cb(new Error('Only image files (jpg, jpeg, png, webp) are allowed!'));
     }
 }
 
+// Multer upload configuration with limits (optional)
 const upload = multer({
     storage,
-    fileFilter: function (req, file, cb) {
-        checkFileType(file, cb);
-    },
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+    fileFilter: checkFileType,
 });
 
-router.post('/', upload.single('image'), (req, res) => {
-    try {
-        if (!req.file) {
-            return res.status(400).json({ success: false, message: 'No file uploaded' });
+// Upload endpoint
+router.post('/', (req, res) => {
+    upload.single('image')(req, res, (err) => {
+        if (err) {
+            // Handle multer errors
+            if (err instanceof multer.MulterError) {
+                // A Multer error occurred (e.g., file too large)
+                return res.status(400).json({
+                    success: false,
+                    message: err.message,
+                });
+            } else if (err) {
+                // A custom error (e.g., from fileFilter)
+                return res.status(400).json({
+                    success: false,
+                    message: err.message,
+                });
+            }
         }
+
+        // If no file was uploaded
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: 'No file uploaded',
+            });
+        }
+
+        // Success response
         res.json({
             success: true,
-            message: 'Image Uploaded successfully',
-            image: `/uploads/${req.file.filename}`,
+            message: 'Image uploaded successfully',
+            image: `/uploads/${req.file.filename}`, // URL path for frontend
         });
-    } catch (error) {
-        console.error('File Upload Error:', error);
-        res.status(500).json({ success: false, message: 'Server error during upload' });
-    }
+    });
 });
 
 export default router;

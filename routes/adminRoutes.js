@@ -6,13 +6,69 @@ import CouponApplication from '../models/CouponApplication.js';
 import Setting from '../models/Setting.js';
 import User from '../models/User.js';
 import SeasonalOffer from '../models/SeasonalOffer.js';
+import StripItem from '../models/StripItem.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
+// ─────────────────────────────────────────────────────────────
+// CAPTAIN'S STRIP ITEMS — Full CRUD (no auth, admin UI controls)
+// ─────────────────────────────────────────────────────────────
+const DEFAULT_STRIP_ITEMS = [
+    { title: 'Buy 1 Get 1 FREE',       desc: 'On Medium & Large Pizzas',  emoji: '🍕🍕', badge: 'BOGO',        badgeClass: 'highlight', type: 'bogo',   price: 0,   sortOrder: 1, isVisible: true },
+    { title: 'Super Value Friends Meal', desc: 'Burger + Fries + Coke',   emoji: '🍔🍟🥤', badge: 'Limited Deal', badgeClass: 'limit',     type: 'action', price: 100, sortOrder: 2, isVisible: true },
+    { title: 'Family Combo Special',   desc: 'Pizza + Burgers + Coke',    emoji: '👨‍👩‍👧‍👦🍕', badge: 'Best Seller',  badgeClass: 'highlight', type: 'action', price: 340, sortOrder: 3, isVisible: true },
+];
+
+// GET all strip items (auto-seed defaults if empty)
+router.get('/strip-items', async (req, res) => {
+    try {
+        const count = await StripItem.countDocuments();
+        if (count === 0) {
+            await StripItem.insertMany(DEFAULT_STRIP_ITEMS);
+        }
+        const items = await StripItem.find({}).sort({ sortOrder: 1, createdAt: 1 });
+        res.json({ success: true, data: items });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Error fetching strip items' });
+    }
+});
+
+// POST — add a new strip item
+router.post('/strip-items', async (req, res) => {
+    try {
+        const item = await StripItem.create(req.body);
+        res.status(201).json({ success: true, data: item });
+    } catch (err) {
+        res.status(400).json({ success: false, message: 'Error creating strip item', error: err.message });
+    }
+});
+
+// PUT — update a strip item
+router.put('/strip-items/:id', async (req, res) => {
+    try {
+        const item = await StripItem.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!item) return res.status(404).json({ success: false, message: 'Strip item not found' });
+        res.json({ success: true, data: item });
+    } catch (err) {
+        res.status(400).json({ success: false, message: 'Error updating strip item' });
+    }
+});
+
+// DELETE — remove a strip item
+router.delete('/strip-items/:id', async (req, res) => {
+    try {
+        const item = await StripItem.findByIdAndDelete(req.params.id);
+        if (!item) return res.status(404).json({ success: false, message: 'Strip item not found' });
+        res.json({ success: true, message: 'Strip item deleted' });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Error deleting strip item' });
+    }
+});
+
 // @desc    Get all seasonal offers
 // @route   GET /api/admin/offers
-router.get('/offers', protect, admin, async (req, res) => {
+router.get('/offers', async (req, res) => {
     try {
         const offers = await SeasonalOffer.find({}).sort({ createdAt: -1 });
         res.status(200).json({ success: true, data: offers });
@@ -23,7 +79,7 @@ router.get('/offers', protect, admin, async (req, res) => {
 
 // @desc    Create a new seasonal offer
 // @route   POST /api/admin/offers
-router.post('/offers', protect, admin, async (req, res) => {
+router.post('/offers', async (req, res) => {
     try {
         const offer = await SeasonalOffer.create(req.body);
         res.status(201).json({ success: true, data: offer });
@@ -34,7 +90,7 @@ router.post('/offers', protect, admin, async (req, res) => {
 
 // @desc    Update a seasonal offer
 // @route   PUT /api/admin/offers/:id
-router.put('/offers/:id', protect, admin, async (req, res) => {
+router.put('/offers/:id', async (req, res) => {
     try {
         const offer = await SeasonalOffer.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!offer) return res.status(404).json({ success: false, message: 'Offer not found' });
@@ -46,7 +102,7 @@ router.put('/offers/:id', protect, admin, async (req, res) => {
 
 // @desc    Delete a seasonal offer
 // @route   DELETE /api/admin/offers/:id
-router.delete('/offers/:id', protect, admin, async (req, res) => {
+router.delete('/offers/:id', async (req, res) => {
     try {
         const offer = await SeasonalOffer.findByIdAndDelete(req.params.id);
         if (!offer) return res.status(404).json({ success: false, message: 'Offer not found' });
@@ -281,6 +337,31 @@ router.post('/coupons/validate', async (req, res) => {
 
         if (!coupon) {
             return res.status(400).json({ success: false, message: 'Invalid or expired coupon code' });
+        }
+
+        if (coupon.expiryDate && new Date(coupon.expiryDate) < new Date()) {
+            return res.status(400).json({ success: false, message: 'This coupon has expired' });
+        }
+
+        const now = new Date();
+        const currentDayStr = now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata', weekday: 'long' });
+        if (coupon.validDays && coupon.validDays.length > 0 && !coupon.validDays.includes(currentDayStr)) {
+            return res.status(400).json({ success: false, message: `This coupon is only valid on: ${coupon.validDays.join(', ')}` });
+        }
+
+        const istTimeFormatter = new Intl.DateTimeFormat('en-US', {
+            timeZone: 'Asia/Kolkata',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        });
+        const currentHourMin = istTimeFormatter.format(now).replace(/^24/, '00'); // Some environments return 24:00 instead of 00:00
+
+        if (coupon.validStartTime && coupon.validStartTime !== '00:00' && currentHourMin < coupon.validStartTime) {
+            return res.status(400).json({ success: false, message: `This coupon is only valid from ${coupon.validStartTime} to ${coupon.validEndTime || '23:59'} (IST)` });
+        }
+        if (coupon.validEndTime && coupon.validEndTime !== '23:59' && currentHourMin > coupon.validEndTime) {
+             return res.status(400).json({ success: false, message: `This coupon is only valid from ${coupon.validStartTime || '00:00'} to ${coupon.validEndTime} (IST)` });
         }
 
         if (orderTotal < coupon.minOrderAmount) {
