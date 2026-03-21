@@ -128,11 +128,15 @@ app.get('/', (req, res) => {
 const SELF_URL = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
 setInterval(() => {
     const healthUrl = `${SELF_URL}/health`;
-    http.get(healthUrl, (res) => {
-        if (res.statusCode === 200) {
-            console.log(`🏓 Keep-alive ping successful: ${res.statusCode}`);
-        }
-    }).on('error', (err) => {
-        console.error('❌ Keep-alive error:', err.message);
-    });
+    fetch(healthUrl)
+        .then(res => {
+            if (res.ok) {
+                console.log(`🏓 Keep-alive ping successful: ${res.status}`);
+            } else {
+                console.log(`⚠️ Keep-alive ping returned status: ${res.status}`);
+            }
+        })
+        .catch(err => {
+            console.error('❌ Keep-alive error:', err.message);
+        });
 }, 14 * 60 * 1000); // 14 minutes
