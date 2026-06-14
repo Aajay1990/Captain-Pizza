@@ -1,0 +1,124 @@
+Running build and push process... 
+==================================== 
+Using system git. 
+ 
+Setting global email to "captainpizzadayalpur@gmail.com" 
+Setting global name to "Aajay1990" 
+[1/5] Git status: 
+On branch main
+
+No commits yet
+
+Changes to be committed:
+  (use "git rm --cached <file>..." to unstage)
+	new file:   backend
+	new file:   build_and_push.bat
+	new file:   build_and_push_log.txt
+	new file:   check_dot_git.bat
+	new file:   debug_push.bat
+	new file:   find_any_git.bat
+	new file:   find_git.bat
+	new file:   frontend
+	new file:   git_debug_log.txt
+	new file:   git_deep_search_log.txt
+	new file:   git_search_log.txt
+	new file:   start_localhost.bat
+	new file:   test_node.js
+	new file:   test_out.txt
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+  (commit or discard the untracked or modified content in submodules)
+	modified:   backend (modified content, untracked content)
+	modified:   build_and_push.bat
+	modified:   build_and_push_log.txt
+	modified:   frontend (modified content, untracked content)
+
+[2/5] Building frontend... 
+
+> frontend@0.0.0 build
+> vite build
+
+[36mvite v5.4.21 [32mbuilding for production...[36m[39m
+transforming...
+[32m✓[39m 1907 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                                       [39m[1m[2m    3.39 kB[22m[1m[22m[2m │ gzip:  1.39 kB[22m
+[2mdist/[22m[32massets/qr code-sXZXiSBy.png                      [39m[1m[2m   33.39 kB[22m[1m[22m
+[2mdist/[22m[32massets/logo-sFvzCCTw.png                         [39m[1m[2m   58.18 kB[22m[1m[22m
+[2mdist/[22m[32massets/VANILA SHAKE-CbfiXqbF.png                 [39m[1m[2m  126.28 kB[22m[1m[22m
+[2mdist/[22m[32massets/instgram logo-qPap0a3R.png                [39m[1m[2m  153.25 kB[22m[1m[22m
+[2mdist/[22m[32massets/CHEESY GARLIC BREAD-Db3kAtFV.png          [39m[1m[2m  164.01 kB[22m[1m[22m
+[2mdist/[22m[32massets/COLD COFFEE-DU4J7YIg.png                  [39m[1m[2m  164.75 kB[22m[1m[22m
+[2mdist/[22m[32massets/VEG TIKKI BURGER-CFAGfajJ.png             [39m[1m[2m  167.35 kB[22m[1m[22m
+[2mdist/[22m[32massets/CLASSIC VEG-BDew9-m5.png                  [39m[1m[2m  177.85 kB[22m[1m[22m
+[2mdist/[22m[32massets/GREEN APPLE-BIwgODqo.png                  [39m[1m[2m  182.65 kB[22m[1m[22m
+[2mdist/[22m[32massets/CRISPY VEG WRAP-Dq-zIo8z.png              [39m[1m[2m  196.94 kB[22m[1m[22m
+[2mdist/[22m[32massets/MAXICAN SPECIAL-BCvj0wb8.png              [39m[1m[2m  211.52 kB[22m[1m[22m
+[2mdist/[22m[32massets/CHEESY BURGER-r3DfMRPI.png                [39m[1m[2m  216.19 kB[22m[1m[22m
+[2mdist/[22m[32massets/MONSTER CLUB-Z9J5gvY7.png                 [39m[1m[2m  260.16 kB[22m[1m[22m
+[2mdist/[22m[32massets/GOLDEN CORN VEG-BsAvN6Dx.png              [39m[1m[2m  283.32 kB[22m[1m[22m
+[2mdist/[22m[32massets/CLASSIC VEG WRAP-B5T7676j.png             [39m[1m[2m  292.75 kB[22m[1m[22m
+[2mdist/[22m[32massets/MAXICAN SPECIAL2-BUi43Ios.png             [39m[1m[2m  317.40 kB[22m[1m[22m
+[2mdist/[22m[32massets/BUTTER SCOTCH SHAKE -1hCfG49I.png         [39m[1m[2m  320.88 kB[22m[1m[22m
+[2mdist/[22m[32massets/LEAMON ICE TEA-BeTP5tvb.png               [39m[1m[2m  344.56 kB[22m[1m[22m
+[2mdist/[22m[32massets/GOLDEN LOVER -DgnPsaOj.png                [39m[1m[2m  348.05 kB[22m[1m[22m
+[2mdist/[22m[32massets/SPICY STUFFED GARLIC BREAD-BR9Pp8TO.png   [39m[1m[2m  352.25 kB[22m[1m[22m
+[2mdist/[22m[32massets/CHEF_S VEG SPECIAL PIZZA-DSc1SuJT.png     [39m[1m[2m  359.85 kB[22m[1m[22m
+[2mdist/[22m[32massets/TOMATO-BeuvbiCd.png                       [39m[1m[2m  372.21 kB[22m[1m[22m
+[2mdist/[22m[32massets/MONSTER CLUB WRAP-DMRv4ZHZ.png            [39m[1m[2m  376.04 kB[22m[1m[22m
+[2mdist/[22m[32massets/BLUE OCEAN-B_B8MDQL.png                   [39m[1m[2m  383.50 kB[22m[1m[22m
+[2mdist/[22m[32massets/CHEESE GRILL SANDWICH-HmrMA9eF.png        [39m[1m[2m  398.91 kB[22m[1m[22m
+[2mdist/[22m[32massets/FRENCH FRIES-DfOJtJGK.png                 [39m[1m[2m  420.09 kB[22m[1m[22m
+[2mdist/[22m[32massets/CRISPY VEG-BF41Atp_.png                   [39m[1m[2m  438.75 kB[22m[1m[22m
+[2mdist/[22m[32massets/hero-user-pizza-TeHehsFi.jpg              [39m[1m[2m  442.28 kB[22m[1m[22m
+[2mdist/[22m[32massets/VEG. GRILL SANDWICH-wfjnMR0y.png          [39m[1m[2m  443.61 kB[22m[1m[22m
+[2mdist/[22m[32massets/WATERMELON -CMA6RMVm.png                  [39m[1m[2m  447.32 kB[22m[1m[22m
+[2mdist/[22m[32massets/MIX MASTI VEG-C-GLHkih.png                [39m[1m[2m  450.02 kB[22m[1m[22m
+[2mdist/[22m[32massets/STRAWBERRY SHAKE-Dbo9Vy3U.png             [39m[1m[2m  452.88 kB[22m[1m[22m
+[2mdist/[22m[32massets/SPICY VEG-DCZUUqcw.png                    [39m[1m[2m  478.37 kB[22m[1m[22m
+[2mdist/[22m[32massets/ONION-Yblglm4K.png                        [39m[1m[2m  485.04 kB[22m[1m[22m
+[2mdist/[22m[32massets/PANEER WRAP-BPdzmSEi.png                  [39m[1m[2m  501.78 kB[22m[1m[22m
+[2mdist/[22m[32massets/MASALA SODA-DCKFMSX1.png                  [39m[1m[2m  511.51 kB[22m[1m[22m
+[2mdist/[22m[32massets/TOMATO _ CAPSICUM-FEcSegn4.png            [39m[1m[2m  518.46 kB[22m[1m[22m
+[2mdist/[22m[32massets/SPL. PUNJABI PANEER MASTI-PKdvkYUJ.png    [39m[1m[2m  538.96 kB[22m[1m[22m
+[2mdist/[22m[32massets/SPL. SPICY PEPPY PANEER-3yDVKV93.png      [39m[1m[2m  541.35 kB[22m[1m[22m
+[2mdist/[22m[32massets/MINT MOJITO-C2D2ZEnC.png                  [39m[1m[2m  542.62 kB[22m[1m[22m
+[2mdist/[22m[32massets/pizza menu 1-C6M9EJKI.png                 [39m[1m[2m  560.79 kB[22m[1m[22m
+[2mdist/[22m[32massets/SPL. SUPREME VEG-DR7QLJA9.png             [39m[1m[2m  571.34 kB[22m[1m[22m
+[2mdist/[22m[32massets/SPL. DOUBLE CHEES MARGERITA-DwvcrZ3t.png  [39m[1m[2m  604.29 kB[22m[1m[22m
+[2mdist/[22m[32massets/GOLDEN PARADISE-B3QfDC26.png              [39m[1m[2m  607.83 kB[22m[1m[22m
+[2mdist/[22m[32massets/OREO SHAKE-Dy-npiXl.png                   [39m[1m[2m  617.78 kB[22m[1m[22m
+[2mdist/[22m[32massets/VEG TIKKI WRAP-DgqWX4o3.png               [39m[1m[2m  651.62 kB[22m[1m[22m
+[2mdist/[22m[32massets/CHOCOLATE SHAKE-CGwFZLLk.png              [39m[1m[2m  669.79 kB[22m[1m[22m
+[2mdist/[22m[32massets/SPL. DELUXE VEG-Bgwkhi_9.png              [39m[1m[2m  675.06 kB[22m[1m[22m
+[2mdist/[22m[32massets/2 IN 1 PIZZA-BPJaLVMP.png                 [39m[1m[2m  692.04 kB[22m[1m[22m
+[2mdist/[22m[32massets/luxury-hero-pizza-BWunWtcg.png            [39m[1m[2m  713.01 kB[22m[1m[22m
+[2mdist/[22m[32massets/pizza menu 2-DnjiEF3N.png                 [39m[1m[2m  721.11 kB[22m[1m[22m
+[2mdist/[22m[32massets/PERI PERI FRIES-ClpFDiG3.png              [39m[1m[2m  745.60 kB[22m[1m[22m
+[2mdist/[22m[32massets/SPL. MAKHANI PANEER-RUZkAoit.png          [39m[1m[2m  758.75 kB[22m[1m[22m
+[2mdist/[22m[32massets/hero-premium-pizza-BzCpwIch.png           [39m[1m[2m  763.84 kB[22m[1m[22m
+[2mdist/[22m[32massets/RED SAUCE PASTA-B35D0m82.png              [39m[1m[2m  770.16 kB[22m[1m[22m
+[2mdist/[22m[32massets/FARM HOUSE-Do_2cCPv.png                   [39m[1m[2m  797.95 kB[22m[1m[22m
+[2mdist/[22m[32massets/TANDOORI SAUCE PASTA-rLiiGbUl.png         [39m[1m[2m  871.05 kB[22m[1m[22m
+[2mdist/[22m[32massets/CHILLY SAUCE PASTA-DecJn9RV.png           [39m[1m[2m  906.83 kB[22m[1m[22m
+[2mdist/[22m[32massets/EXTRAVAGANZA VEG-CFZFziZI.png             [39m[1m[2m  946.83 kB[22m[1m[22m
+[2mdist/[22m[32massets/ONION_ JALAPENO-jQio3A26.png              [39m[1m[2m  962.21 kB[22m[1m[22m
+[2mdist/[22m[32massets/WHITE SAUCE PASTA-ByuhqDWf.png            [39m[1m[2m1,024.73 kB[22m[1m[22m
+[2mdist/[22m[32massets/MAKHANI SAUCE PASTA-CCQaIHnl.png          [39m[1m[2m1,131.14 kB[22m[1m[22m
+[2mdist/[22m[32massets/CHEESE MAGGI-lZHdBiKK.png                 [39m[1m[2m1,219.19 kB[22m[1m[22m
+[2mdist/[22m[32massets/SPICY WONDER-B7qgkEi9.png                 [39m[1m[2m1,340.04 kB[22m[1m[22m
+[2mdist/[22m[32massets/MERGHERITA-D5TS4pf9.png                   [39m[1m[2m1,363.63 kB[22m[1m[22m
+[2mdist/[22m[32massets/Paneer _ Onion-CIRhc8Rp.png               [39m[1m[2m1,625.45 kB[22m[1m[22m
+[2mdist/[22m[32massets/Family Combo-Cy-MAq0M.png                 [39m[1m[2m1,701.02 kB[22m[1m[22m
+[2mdist/[22m[32massets/SWEET CORN-BcFwkwqd.png                   [39m[1m[2m1,725.42 kB[22m[1m[22m
+[2mdist/[22m[32massets/Super Value Friends Meal-C6O1Jl_J.png     [39m[1m[2m1,805.01 kB[22m[1m[22m
+[2mdist/[22m[35massets/index-DBfcWB9w.css                        [39m[1m[2m   96.41 kB[22m[1m[22m[2m │ gzip: 19.43 kB[22m
+[2mdist/[22m[36massets/ui-BmiKgtxB.js                            [39m[1m[2m    0.79 kB[22m[1m[22m[2m │ gzip:  0.50 kB[22m
+[2mdist/[22m[36massets/react-Cxj_KmsH.js                         [39m[1m[2m  178.04 kB[22m[1m[22m[2m │ gzip: 58.40 kB[22m
+[2mdist/[22m[36massets/index-liP8Zmvx.js                         [39m[1m[2m  255.23 kB[22m[1m[22m[2m │ gzip: 71.35 kB[22m
+[32m✓ built in 3.26s[39m
+Build succeeded. 
+[3/5] Staging changes... 

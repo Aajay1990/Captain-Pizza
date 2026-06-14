@@ -1,0 +1,23 @@
+Running git and build diagnostics... 
+==================================== 
+[1/4] PATH variable: 
+C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\nodejs\;C:\Users\lpawa\AppData\Local\Microsoft\WindowsApps;C:\Users\lpawa\AppData\Local\Programs\Antigravity IDE\bin;C:\Users\lpawa\AppData\Roaming\npm;C:\Program Files (x86)\Nmap 
+==================================== 
+[2/4] Testing git command: 
+INFO: Could not find files for the given pattern(s).
+'git' is not recognized as an internal or external command,
+operable program or batch file.
+==================================== 
+[3/4] Trying git stage and commit: 
+'git' is not recognized as an internal or external command,
+operable program or batch file.
+'git' is not recognized as an internal or external command,
+operable program or batch file.
+==================================== 
+[4/4] Trying git push: 
+'git' is not recognized as an internal or external command,
+operable program or batch file.
+'git' is not recognized as an internal or external command,
+operable program or batch file.
+==================================== 
+Diagnostics completed. 
