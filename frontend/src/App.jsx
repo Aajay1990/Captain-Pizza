@@ -44,7 +44,7 @@ function App() {
       <FloatingActions />
       {!hideHeaderFooter && <Navbar />}
 
-      <main className={isAdminRoute ? 'admin-main-wrapper' : isPosRoute ? 'pos-main-wrapper' : 'main-content'}>
+      <main className={isAdminRoute ? 'admin-main-wrapper' : isPosRoute ? 'pos-main-wrapper' : isTvRoute ? 'tv-main-wrapper' : 'main-content'}>
         <Routes>
           {/* ── Public Routes ─────────────────────────────────────── */}
           <Route path="/" element={<Home />} />

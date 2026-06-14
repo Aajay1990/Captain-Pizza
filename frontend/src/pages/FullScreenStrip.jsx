@@ -202,8 +202,24 @@ const FullScreenStrip = () => {
                                             </div>
                                         ) : (
                                             <>
-                                                <img src={item.image} alt="" className="tv-card-img-blur" />
-                                                <img src={item.image} alt={item.title} className="tv-card-img-contain" />
+                                                <img 
+                                                    src={item.image} 
+                                                    alt="" 
+                                                    className="tv-card-img-blur" 
+                                                    onError={(e) => {
+                                                        e.target.onerror = null;
+                                                        e.target.src = "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800";
+                                                    }}
+                                                />
+                                                <img 
+                                                    src={item.image} 
+                                                    alt={item.title} 
+                                                    className="tv-card-img-contain" 
+                                                    onError={(e) => {
+                                                        e.target.onerror = null;
+                                                        e.target.src = "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800";
+                                                    }}
+                                                />
                                             </>
                                         )}
                                     </div>
@@ -241,8 +257,24 @@ const FullScreenStrip = () => {
                                             </div>
                                         ) : (
                                             <>
-                                                <img src={item.image} alt="" className="tv-card-img-blur" />
-                                                <img src={item.image} alt={item.title} className="tv-card-img-contain" />
+                                                <img 
+                                                    src={item.image} 
+                                                    alt="" 
+                                                    className="tv-card-img-blur" 
+                                                    onError={(e) => {
+                                                        e.target.onerror = null;
+                                                        e.target.src = "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800";
+                                                    }}
+                                                />
+                                                <img 
+                                                    src={item.image} 
+                                                    alt={item.title} 
+                                                    className="tv-card-img-contain" 
+                                                    onError={(e) => {
+                                                        e.target.onerror = null;
+                                                        e.target.src = "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800";
+                                                    }}
+                                                />
                                             </>
                                         )}
                                     </div>
