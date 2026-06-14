@@ -1,0 +1,742 @@
+import React, { useState, useContext, useEffect, useRef } from 'react';
+import './Order.css';
+import { Link, useNavigate } from 'react-router-dom';
+import { CartContext } from '../context/CartContext';
+import { AuthContext } from '../context/AuthContext';
+import pizzaImg1 from '../assets/MERGHERITA.png';
+import burgerImg from '../assets/CHEESY BURGER.png';
+import shakeImg from '../assets/BUTTER SCOTCH SHAKE .png';
+import offer2 from '../assets/Super Value Friends Meal.png';
+import offer3 from '../assets/Family Combo.png';
+import garlic from '../assets/CHEESY GARLIC BREAD.png';
+
+import API_URL from '../apiConfig';
+const API = API_URL;
+const TOPPING_TYPES = ['Tomato', 'Corn', 'Onion', 'Capsicum'];
+const SIZE_ADDONS = [
+    { name: 'Veg Topping', prices: { small: 25, medium: 35, large: 45 } },
+    { name: 'Extra Cheese', prices: { small: 40, medium: 60, large: 90 } },
+    { name: 'Cheese Burst', prices: { small: 50, medium: 60, large: 90 } },
+];
+
+const Order = () => {
+    const { cartItems, addToCart, updateQuantity, clearCart, toggleAddonSML, toggleToppingType } = useContext(CartContext);
+    const { user, refreshUser } = useContext(AuthContext);
+    const navigate = useNavigate();
+
+    const [name, setName] = useState('');
+    const [phone, setPhone] = useState('');
+    const [address, setAddress] = useState('');
+    const [specialInstructions, setSpecialInstructions] = useState('');
+    const [paymentMethod, setPaymentMethod] = useState('online');
+
+    const [couponCode, setCouponCode] = useState('');
+    const [discount, setDiscount] = useState(0);
+    const [couponMessage, setCouponMessage] = useState('');
+    const [isApplying, setIsApplying] = useState(false);
+    const [couponApplied, setCouponApplied] = useState(false);
+    const [orderPlacing, setOrderPlacing] = useState(false);
+    const [openCustom, setOpenCustom] = useState({});
+    const toggleCustom = (id) => setOpenCustom(prev => ({ ...prev, [id]: !prev[id] }));
+    const [deliverySettings, setDeliverySettings] = useState({ charge: 40, threshold: 300 });
+    const [adminWhatsApp, setAdminWhatsApp] = useState('919220367325');
+
+    // WhatsApp confirmation state
+    const [orderConfirm, setOrderConfirm] = useState(null);
+    const [showWaPermModal, setShowWaPermModal] = useState(false);
+    const [permPendingFn, setPermPendingFn] = useState(null);
+    const waUrlRef = useRef('');
+
+    useEffect(() => {
+        if (user) { setName(user.name || ''); setPhone(user.phone || ''); }
+        (async () => {
+            try {
+                const res = await fetch(`${API}/api/admin/settings`);
+                const data = await res.json();
+                if (data.success) {
+                    const fv = (k, d) => data.data.find(s => s.key === k)?.value || d;
+                    setDeliverySettings({ charge: fv('delivery_charge', 40), threshold: fv('free_delivery_min_order', 300) });
+                    setAdminWhatsApp(fv('admin_whatsapp_number', '919220367325'));
+                }
+            } catch (e) { console.error(e); }
+        })();
+    }, [user]);
+
+    const cartSubtotal = cartItems.reduce((acc, i) => acc + i.price * i.quantity, 0);
+    const deliveryFee = cartItems.length > 0 ? (cartSubtotal >= deliverySettings.threshold ? 0 : Number(deliverySettings.charge)) : 0;
+    const finalTotal = Math.max(0, cartSubtotal + deliveryFee - discount);
+
+    // Auto-clear coupon when cart changes (items added, removed, or quantity changed)
+    useEffect(() => {
+        if (discount > 0 || couponApplied) {
+            setDiscount(0);
+            setCouponApplied(false);
+            setCouponCode('');
+            setCouponMessage(cartItems.length > 0 ? '⚠️ Cart updated. Coupon removed.' : '');
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [cartSubtotal, cartItems.length]);
+
+    const buildWhatsAppText = (orderResp, paymentId, items) => {
+        let text = `🍕 *NEW ORDER* — CAPTAIN PIZZA\n━━━━━━━━━━━━━━━━\n🆔 Order #${orderResp._id.slice(-6).toUpperCase()}\n💳 Payment ID: ${paymentId || 'N/A'}\n👤 ${name} | 📞 ${phone}\n📍 ${address}\n━━━━━━━━━━━━━━━━\n`;
+        items.forEach((item, i) => {
+            text += `${i + 1}. ${item.name} x${item.quantity} — Rs.${item.price * item.quantity}\n`;
+            const types = item.toppingTypes?.join(', ');
+            if (types) text += `   Veg Toppings: ${types}\n`;
+            const ketchupEntry = item.toppings?.find(t => t.baseName === 'Ketchup Packets');
+            if (ketchupEntry && ketchupEntry.price > 0) text += `   Ketchup x${Math.round(ketchupEntry.price)}\n`;
+            const addons = item.toppings?.filter(t => t.baseName !== 'Ketchup Packets').map(t => `${t.name || t.baseName}${t.size ? ` (${t.size})` : ''}`).join(', ');
+            if (addons) text += `   Add-ons: ${addons}\n`;
+        });
+        if (specialInstructions.trim()) text += `\n📝 *Special Instructions:* ${specialInstructions.trim()}\n`;
+        text += `━━━━━━━━━━━━━━━━\nSubtotal: Rs.${cartSubtotal}\nDelivery: Rs.${deliveryFee}\n`;
+        if (discount > 0) text += `Discount: -Rs.${discount}\n`;
+        text += `💰 *TOTAL PAID: Rs.${finalTotal}* ✅`;
+        return text;
+    };
+
+    // When user changes the coupon code after it was applied, reset discount
+    const handleCouponCodeChange = (val) => {
+        setCouponCode(val);
+        if (couponApplied) {
+            // If they're editing the code, clear the applied discount
+            setDiscount(0);
+            setCouponApplied(false);
+            setCouponMessage('');
+        }
+    };
+
+    const handleRemoveCoupon = () => {
+        setCouponCode('');
+        setDiscount(0);
+        setCouponApplied(false);
+        setCouponMessage('');
+    };
+
+    const handleApplyCoupon = async () => {
+        const code = couponCode.trim().toUpperCase();
+        if (!code) { setCouponMessage('⚠️ Please enter a coupon code first.'); return; }
+        setIsApplying(true);
+        setCouponMessage('');
+        try {
+            const res = await fetch(`${API}/api/admin/coupons/validate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code, orderTotal: cartSubtotal })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setDiscount(data.discount);
+                setCouponApplied(true);
+                // If it's a seasonal offer with a markedPrice, show strikethrough message
+                if (data.markedPrice && data.finalPrice !== null) {
+                    setCouponMessage(`✅ ${data.message}. Offer: ₹${data.markedPrice} → ₹${Math.round(data.finalPrice)} (you save ₹${Math.round(data.discount)})`);
+                } else {
+                    setCouponMessage(`✅ ${data.message} (-₹${Math.round(data.discount)})`);
+                }
+            } else {
+                setDiscount(0);
+                setCouponApplied(false);
+                setCouponMessage(`❌ ${data.message}`);
+            }
+        } catch {
+            setCouponMessage('❌ Error validating coupon. Please try again.');
+        } finally {
+            setIsApplying(false);
+        }
+    };
+
+    const makeObjectId = (id) => {
+        const s = String(id);
+        if (/^[a-fA-F0-9]{24}$/.test(s)) return s;
+        let h = '';
+        for (let i = 0; i < s.length; i++) h += s.charCodeAt(i).toString(16);
+        return h.padEnd(24, '0').slice(0, 24);
+    };
+
+    // WhatsApp permission gate — called before real payment handler
+    const handlePlaceOrderWithPermission = (e) => {
+        e.preventDefault(); // Prevent default form submission
+        const alreadyGranted = localStorage.getItem('cp_wa_permission') === 'granted';
+        if (alreadyGranted) {
+            _actualPlaceOrder();
+        } else {
+            // Store the actual order handler to run after user confirms
+            setPermPendingFn(() => _actualPlaceOrder);
+            setShowWaPermModal(true);
+        }
+    };
+
+    const confirmWaPermission = () => {
+        localStorage.setItem('cp_wa_permission', 'granted');
+        setShowWaPermModal(false);
+        if (permPendingFn) { permPendingFn(); setPermPendingFn(null); }
+    };
+
+    const denyWaPermission = () => {
+        localStorage.setItem('cp_wa_permission', 'denied'); // Or just don't set 'granted'
+        setShowWaPermModal(false);
+        // Optionally, proceed with order without WhatsApp, or inform user
+        alert('You chose not to grant WhatsApp permission. We recommend granting it for order updates.');
+        if (permPendingFn) { permPendingFn(); setPermPendingFn(null); } // Still proceed with order
+    };
+
+    const _actualPlaceOrder = async () => {
+        if (cartItems.length === 0) return;
+
+        // Phone validation — must be exactly 10 digits
+        if (!/^[6-9]\d{9}$/.test(phone)) {
+            alert('⚠️ Please enter a valid 10-digit Indian mobile number.');
+            return;
+        }
+
+        const invalid = cartItems.find(item => {
+            const hasVegTopping = item.toppings?.some(t => t.baseName === 'Veg Topping');
+            return hasVegTopping && (!item.toppingTypes || item.toppingTypes.length === 0);
+        });
+        if (invalid) {
+            alert(`⚠️ Please select at least one veg topping type (Tomato, Corn, Onion, Capsicum) for "${invalid.name}"`);
+            return;
+        }
+
+        setOrderPlacing(true);
+        const snapshotItems = [...cartItems];
+        
+        const deviceId = localStorage.getItem('cp_guest_id') || `DEV-${Math.random().toString(36).substr(2, 9)}-${Date.now()}`;
+
+        const orderData = {
+            userId: user?._id || null,
+            deviceUUID: deviceId,
+            customerInfo: { name, phone, address, email: user?.email || '', specialInstructions },
+            orderItems: snapshotItems.map(i => ({
+                menuItem: makeObjectId(i._id || i.id), name: i.name,
+                quantity: i.quantity, size: i.selectedSize || 'regular', price: i.price,
+                toppings: [
+                    ...(i.toppings?.map(t => t.name || t.baseName) || []),
+                    ...(i.toppingTypes || [])
+                ]
+            })),
+            totalAmount: finalTotal, orderType: 'delivery', paymentMethod,
+            discount, tax: 0, subTotal: cartSubtotal, paymentStatus: 'pending'
+        };
+
+        try {
+            const { key } = await (await fetch(`${API}/api/orders/razorpay/key`)).json();
+            if (!key) { alert('Razorpay not configured.'); setOrderPlacing(false); return; }
+            const { success, order: rzpOrder } = await (await fetch(`${API}/api/orders/razorpay/create`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount: finalTotal })
+            })).json();
+            if (!success) { alert('Failed to create payment order.'); setOrderPlacing(false); return; }
+
+            new window.Razorpay({
+                key, amount: rzpOrder.amount, currency: 'INR',
+                name: 'Captain Pizza', description: 'Order Payment', order_id: rzpOrder.id,
+                handler: async (response) => {
+                    setOrderPlacing(true);
+                    try {
+                        const vd = await (await fetch(`${API}/api/orders/razorpay/verify`, {
+                            method: 'POST', headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ ...response, orderData })
+                        })).json();
+                        if (vd.success) {
+                            if (user) refreshUser({ ...user, hasUsedWelcomeOffer: true });
+                            const waText = buildWhatsAppText(vd.data, response.razorpay_payment_id, snapshotItems);
+                            const waUrl = `https://wa.me/${adminWhatsApp}?text=${encodeURIComponent(waText)}`;
+                            waUrlRef.current = waUrl;
+
+                            localStorage.setItem('cp_order_phone', phone);
+                            localStorage.setItem('cp_active_track_id', vd.data._id);
+                            clearCart();
+
+                            // Show confirm modal immediately — let user tap WhatsApp manually (no auto-open)
+                            setOrderConfirm({ orderId: vd.data._id, waUrl });
+
+                        } else {
+                            alert('Payment verification failed. Please screenshot and contact us.');
+                        }
+                    } catch (err) {
+                        alert('Order verification error. Please contact support.');
+                    }
+                    setOrderPlacing(false);
+                },
+                prefill: { name, contact: phone, email: user?.email || '' },
+                theme: { color: '#B71C1C' },
+                modal: { ondismiss: () => setOrderPlacing(false) }
+            }).open();
+            setOrderPlacing(false);
+        } catch (err) {
+            alert('Could not load payment gateway. Please try again.');
+            setOrderPlacing(false);
+        }
+    };
+
+    // Ketchup stepper helper
+    const getKetchupQty = (item) => {
+        const k = item.toppings?.find(t => t.baseName === 'Ketchup Packets');
+        return k ? Math.round(k.price) : 0;
+    };
+
+    return (
+        <div className="order-page animate-fade-in">
+            {/* ── WhatsApp Permission Modal ── */}
+            {showWaPermModal && (
+                <div style={{
+                    position: 'fixed', inset: 0, zIndex: 99999,
+                    background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(5px)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
+                }}>
+                    <div style={{
+                        background: '#fff', borderRadius: '24px', padding: '32px', maxWidth: '400px', width: '100%',
+                        boxShadow: '0 40px 80px rgba(0,0,0,0.3)', textAlign: 'center',
+                        animation: 'popIn 0.3s cubic-bezier(0.34,1.56,0.64,1)'
+                    }}>
+                        <div style={{ fontSize: '3rem', marginBottom: '16px', color: '#25D366' }}>
+                            <i className="fab fa-whatsapp"></i>
+                        </div>
+                        <h2 style={{ margin: '0 0 12px', fontSize: '1.4rem', fontWeight: '800', color: '#111' }}>
+                            WhatsApp Order Details
+                        </h2>
+                        <p style={{ margin: '0 0 24px', fontSize: '0.95rem', color: '#555', lineHeight: '1.5', fontWeight: '500' }}>
+                            To confirm your order, we need permission to use WhatsApp services.<br/><br/>
+                            If you allow this, your order details (items, amount, and order ID) will be sent to the restaurant through WhatsApp for order confirmation.
+                        </p>
+                        <button
+                            onClick={confirmWaPermission}
+                            style={{
+                                width: '100%', padding: '16px', background: '#25D366', color: '#fff',
+                                border: 'none', borderRadius: '14px', fontWeight: '800', fontSize: '1.05rem',
+                                cursor: 'pointer', boxShadow: '0 8px 16px rgba(37,211,102,0.3)', transition: 'transform 0.2s'
+                            }}
+                            onMouseEnter={e => e.target.style.transform = 'scale(1.02)'}
+                            onMouseLeave={e => e.target.style.transform = 'scale(1)'}
+                        >
+                            Confirm & Continue
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* ── Order Confirmed Overlay ── */}
+            {orderConfirm && (
+                <div style={{
+                    position: 'fixed', inset: 0, zIndex: 99999,
+                    background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(10px)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
+                }}>
+                    <div style={{
+                        background: '#fff', borderRadius: '24px', padding: '36px 32px', maxWidth: '440px', width: '100%',
+                        boxShadow: '0 40px 80px rgba(0,0,0,0.4)', textAlign: 'center',
+                        animation: 'popIn 0.35s cubic-bezier(0.34,1.56,0.64,1)'
+                    }}>
+                        <div style={{ fontSize: '3.5rem', marginBottom: '12px' }}>🎉</div>
+                        <h2 style={{ margin: '0 0 8px', fontSize: '1.6rem', fontWeight: '900', color: '#B71C1C' }}>Order Placed!</h2>
+                        <p style={{ margin: '0 0 6px', fontSize: '0.9rem', color: '#555', fontWeight: '600' }}>
+                            Order ID: <strong style={{ color: '#B71C1C' }}>{orderConfirm.orderId.slice(-6).toUpperCase()}</strong>
+                        </p>
+                        <p style={{ margin: '0 0 24px', fontSize: '0.85rem', color: '#888' }}>
+                            Your payment was successful. We're preparing your order! 🍕
+                        </p>
+
+                        <a
+                            href={orderConfirm.waUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                                display: 'block', width: '100%', padding: '16px', background: '#25D366',
+                                color: '#fff', borderRadius: '14px', fontWeight: '900', fontSize: '1.05rem',
+                                textDecoration: 'none', marginBottom: '16px', boxShadow: '0 8px 16px rgba(37,211,102,0.3)',
+                                transition: 'transform 0.2s'
+                            }}
+                            onClick={() => {
+                                setTimeout(() => { setOrderConfirm(null); navigate('/order-history'); }, 500);
+                            }}
+                        >
+                            <i className="fab fa-whatsapp" style={{ marginRight: '8px', fontSize: '1.2rem' }}></i>
+                            Send Order to Restaurant
+                        </a>
+
+                        <button
+                            onClick={() => { setOrderConfirm(null); navigate('/order-history'); }}
+                            style={{
+                                width: '100%', padding: '14px', background: '#f5f5f5', color: '#444',
+                                border: '1px solid #ddd', borderRadius: '14px', fontWeight: '800', fontSize: '0.95rem',
+                                cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.2s'
+                            }}
+                        >
+                            Skip & Track My Order
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Hero Header */}
+            <div className="order-hero">
+                <h1><i className="fas fa-shopping-bag" style={{ marginRight: '10px' }}></i>Your Order</h1>
+                <p>Review your items • Customize • Pay securely</p>
+            </div>
+
+            <div className="order-body">
+                {/* ─── LEFT COLUMN ─── */}
+                <div>
+                    <div className="op-card">
+                        <div className="op-card-head">
+                            <div className="head-icon"><i className="fas fa-shopping-cart"></i></div>
+                            <h2>Cart Items</h2>
+                            <span>{cartItems.length} item{cartItems.length !== 1 ? 's' : ''}</span>
+                        </div>
+                        <div className="op-card-body">
+                            {cartItems.length === 0 ? (
+                                <div className="op-empty">
+                                    <div className="op-empty-icon">🛒</div>
+                                    <p>Your cart is empty</p>
+                                    <Link to="/menu">Browse Menu</Link>
+                                </div>
+                            ) : (
+                                <>
+                                    {cartItems.map((item, index) => {
+                                        const ketchupQty = getKetchupQty(item);
+                                        return (
+                                            <div key={item.cartItemId} className="op-cart-item">
+                                                <div className="op-item-top">
+                                                    <div className="op-item-num">{index + 1}</div>
+                                                    <div className="op-item-info">
+                                                        <div className="op-item-name">{item.name}</div>
+                                                        {item.selectedSize && <div className="op-item-size">{item.selectedSize.charAt(0).toUpperCase() + item.selectedSize.slice(1)} size</div>}
+                                                        {item.toppings?.filter(t => t.baseName !== 'Ketchup Packets').length > 0 && (
+                                                            <div style={{ fontSize: '0.75rem', color: '#B71C1C', marginTop: '2px', fontWeight: '600' }}>
+                                                                + {item.toppings.filter(t => t.baseName !== 'Ketchup Packets').map(t => t.name || t.baseName).join(', ')}
+                                                            </div>
+                                                        )}
+                                                        {item.toppingTypes?.length > 0 && (
+                                                            <div style={{ fontSize: '0.72rem', color: '#2E7D32', marginTop: '2px', fontWeight: '600' }}>
+                                                                Veg: {item.toppingTypes.join(', ')}
+                                                            </div>
+                                                        )}
+                                                        <button 
+                                                           onClick={() => toggleCustom(item.cartItemId)}
+                                                           style={{ background: 'none', border: 'none', color: '#B71C1C', fontSize: '0.72rem', fontWeight: '800', cursor: 'pointer', padding: '0', textDecoration: 'underline', marginTop: '4px' }}
+                                                        >
+                                                            {openCustom[item.cartItemId] ? 'Done Customizing ↑' : 'Customize options & Add-ons ↓'}
+                                                        </button>
+                                                    </div>
+                                                    <div className="op-item-price-qty">
+                                                        <div className="op-qty-ctrl">
+                                                            <button onClick={() => updateQuantity(item.cartItemId, -1)}>−</button>
+                                                            <span>{item.quantity}</span>
+                                                            <button onClick={() => updateQuantity(item.cartItemId, 1)}>+</button>
+                                                        </div>
+                                                        <div className="op-item-total">Rs.{item.price * item.quantity}</div>
+                                                        <button 
+                                                           className={`op-remove-btn ${openCustom[item.cartItemId] ? 'active' : ''}`}
+                                                           onClick={() => toggleCustom(item.cartItemId)}
+                                                           title="Customize Add-ons"
+                                                           style={{ color: openCustom[item.cartItemId] ? '#B71C1C' : '#CCC' }}
+                                                        >
+                                                            <i className="fas fa-cog"></i>
+                                                        </button>
+                                                        <button className="op-remove-btn" onClick={() => updateQuantity(item.cartItemId, -item.quantity)}>
+                                                            <i className="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                {/* Add-ons customizer */}
+                                                {openCustom[item.cartItemId] && (
+                                                <div className="op-addons-block animate-slide-up" style={{ marginTop: '12px', borderLeft: '4px solid #B71C1C' }}>
+                                                    <div className="op-addons-label"><i className="fas fa-magic"></i> Customize Add-ons</div>
+                                                    <div className="op-addons-list">
+                                                    {/* Ketchup packets stepper */}
+                                                    <div className="op-addon-row">
+                                                        <div className="op-addon-name">🍅 Ketchup Packets (Rs.1 each)</div>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                            <button
+                                                                className="op-sz-btn"
+                                                                onClick={() => toggleAddonSML(item.cartItemId, 'Ketchup Packets', 'default', Math.max(0, ketchupQty - 1))}
+                                                                disabled={ketchupQty === 0}
+                                                                style={{ minWidth: '30px' }}
+                                                            >−</button>
+                                                            <span style={{ fontWeight: '800', minWidth: '24px', textAlign: 'center', fontSize: '1rem' }}>{ketchupQty}</span>
+                                                            <button
+                                                                className="op-sz-btn active"
+                                                                onClick={() => toggleAddonSML(item.cartItemId, 'Ketchup Packets', 'default', ketchupQty + 1)}
+                                                                style={{ minWidth: '30px' }}
+                                                            >+</button>
+                                                            {ketchupQty > 0 && <span style={{ fontSize: '0.78rem', color: '#B71C1C', fontWeight: '700' }}>+Rs.{ketchupQty}</span>}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Size-based addons */}
+                                                    {SIZE_ADDONS.map(addon => {
+                                                        const selSz = item.toppings?.find(t => t.baseName === addon.name)?.size;
+                                                        return (
+                                                            <div key={addon.name}>
+                                                                <div className="op-addon-row">
+                                                                    <div className="op-addon-name">{addon.name}</div>
+                                                                    <div className="op-size-btns">
+                                                                        {['small', 'medium', 'large'].map(sz => (
+                                                                            <button
+                                                                                key={sz}
+                                                                                className={`op-sz-btn ${selSz === sz ? 'active' : ''}`}
+                                                                                onClick={() => toggleAddonSML(item.cartItemId, addon.name, sz, addon.prices[sz])}
+                                                                            >
+                                                                                {sz === 'small' ? 'S' : sz === 'medium' ? 'M' : 'L'}
+                                                                                <span style={{ opacity: 0.8, fontSize: '0.65rem', marginLeft: '2px' }}>+Rs.{addon.prices[sz]}</span>
+                                                                            </button>
+                                                                        ))}
+                                                                    </div>
+                                                                    {selSz && <span style={{ fontSize: '0.75rem', color: '#B71C1C', fontWeight: '700', marginLeft: '6px' }}>+Rs.{addon.prices[selSz]}</span>}
+                                                                </div>
+
+                                                                {addon.name === 'Veg Topping' && selSz && (
+                                                                    <div className="op-topping-types">
+                                                                        <div className="op-topping-types-label">Select Veg Topping Type <span style={{ color: '#B71C1C' }}>*required</span></div>
+                                                                        <div className="op-type-chips">
+                                                                            {TOPPING_TYPES.map(type => {
+                                                                                const active = item.toppingTypes?.includes(type);
+                                                                                return (
+                                                                                    <button
+                                                                                        key={type}
+                                                                                        className={`op-type-chip ${active ? 'active' : ''}`}
+                                                                                        onClick={() => toggleToppingType(item.cartItemId, type)}
+                                                                                    >
+                                                                                        {active && '✓ '}{type}
+                                                                                    </button>
+                                                                                );
+                                                                            })}
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })}
+                                                    </div>
+                                                </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+
+                                    {/* Coupon */}
+                                    <div className="op-coupon">
+                                        <div className="op-coupon-title">
+                                            🎟️ Have a Promo / Coupon Code?
+                                            {couponApplied && (
+                                                <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: '#2E7D32', fontWeight: '700' }}>
+                                                    ✅ Applied!
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="op-coupon-row">
+                                            <input
+                                                type="text"
+                                                placeholder="ENTER PROMO CODE"
+                                                className="op-coupon-input"
+                                                value={couponCode}
+                                                onChange={e => handleCouponCodeChange(e.target.value.toUpperCase())}
+                                                onKeyDown={e => e.key === 'Enter' && handleApplyCoupon()}
+                                                disabled={couponApplied}
+                                                style={couponApplied ? { background: '#f0fff4', borderColor: '#4CAF50', color: '#2E7D32' } : {}}
+                                            />
+                                            {couponApplied ? (
+                                                <button
+                                                    className="op-coupon-btn"
+                                                    onClick={handleRemoveCoupon}
+                                                    style={{ background: 'linear-gradient(135deg, #e53935, #c62828)' }}
+                                                >
+                                                    Remove
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    className="op-coupon-btn"
+                                                    onClick={handleApplyCoupon}
+                                                    disabled={isApplying || !couponCode.trim()}
+                                                >
+                                                    {isApplying ? <><i className="fas fa-spinner fa-spin"></i> Checking...</> : 'Apply'}
+                                                </button>
+                                            )}
+                                        </div>
+                                        {couponMessage && <p className={`op-coupon-msg ${couponApplied ? 'ok' : 'err'}`}>{couponMessage}</p>}
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* ─── RIGHT COLUMN ─── */}
+                <div className="op-sticky">
+                    {/* Order Summary */}
+                    <div className="op-card" style={{ marginBottom: '20px' }}>
+                        <div className="op-card-head">
+                            <div className="head-icon"><i className="fas fa-receipt"></i></div>
+                            <h2>Order Summary</h2>
+                        </div>
+                        <div className="op-card-body">
+                            <div className="op-summary-block">
+                                <div className="op-sum-row">
+                                    <span>Subtotal</span>
+                                    <span>Rs.{cartSubtotal}</span>
+                                </div>
+                                {cartItems.length > 0 && (
+                                    <div className="op-sum-row">
+                                        <span>Delivery</span>
+                                        <span>{deliveryFee === 0 ? <span className="op-free-badge">FREE</span> : `Rs.${deliveryFee}`}</span>
+                                    </div>
+                                )}
+                                {discount > 0 && (
+                                    <div className="op-sum-row" style={{ color: '#2E7D32', fontWeight: '700' }}>
+                                        <span>Coupon Discount</span>
+                                        <span>−Rs.{Math.round(discount)}</span>
+                                    </div>
+                                )}
+                                <div className="op-sum-row total">
+                                    <span>Total Payable</span>
+                                    <strong>Rs.{finalTotal}</strong>
+                                </div>
+                            </div>
+                            {cartItems.length > 0 && cartSubtotal < deliverySettings.threshold && (
+                                <div style={{ fontSize: '0.78rem', color: '#666', textAlign: 'center', marginTop: '12px', padding: '8px', background: '#FFF8E1', borderRadius: '8px' }}>
+                                    Add Rs.{deliverySettings.threshold - cartSubtotal} more for <strong>FREE delivery</strong>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Checkout Form */}
+                    <div className="op-card">
+                        <div className="op-card-head">
+                            <div className="head-icon"><i className="fas fa-map-marker-alt"></i></div>
+                            <h2>Delivery Details</h2>
+                        </div>
+                        <div className="op-card-body">
+                            <form className="op-form" onSubmit={handlePlaceOrderWithPermission}>
+                                <div className="op-form-group">
+                                    <label><i className="fas fa-user"></i> Full Name</label>
+                                    <input type="text" placeholder="e.g. Rahul Sharma" value={name} onChange={e => setName(e.target.value)} required />
+                                </div>
+                                <div className="op-form-group">
+                                    <label><i className="fas fa-phone"></i> Mobile Number (10 digits)</label>
+                                    <input
+                                        type="tel"
+                                        placeholder="9876543210"
+                                        value={phone}
+                                        maxLength={10}
+                                        onChange={e => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                                        pattern="[6-9][0-9]{9}"
+                                        title="Enter a valid 10-digit Indian mobile number"
+                                        required
+                                        style={{ letterSpacing: '0.1em' }}
+                                    />
+                                </div>
+                                <div className="op-form-group">
+                                    <label><i className="fas fa-map-pin"></i> Delivery Address</label>
+                                    <textarea placeholder="House No., Street, Area, City..." rows="3" value={address} onChange={e => setAddress(e.target.value)} required></textarea>
+                                </div>
+
+                                {/* Special Instructions */}
+                                <div className="op-form-group">
+                                    <label><i className="fas fa-pencil-alt"></i> Special Instructions <span style={{ color: '#999', fontSize: '0.8em' }}>(optional)</span></label>
+                                    <textarea
+                                        placeholder="e.g. Extra spicy, no onions, ring the bell twice..."
+                                        rows="2"
+                                        value={specialInstructions}
+                                        onChange={e => setSpecialInstructions(e.target.value)}
+                                        maxLength={300}
+                                        style={{ fontSize: '0.88rem' }}
+                                    ></textarea>
+                                    {specialInstructions.length > 0 && (
+                                        <span style={{ fontSize: '0.72rem', color: '#999', textAlign: 'right', display: 'block' }}>{specialInstructions.length}/300</span>
+                                    )}
+                                </div>
+
+                                <div className="op-form-group">
+                                    <label><i className="fas fa-credit-card"></i> Payment Method</label>
+                                    <div className="op-payment-opts">
+                                        <div className="op-pay-opt active">
+                                            <span className="pay-icon">💳</span>
+                                            <span className="pay-label">Online (Razorpay)</span>
+                                        </div>
+                                        <div className="op-pay-opt coming-soon">
+                                            <span className="pay-icon">💵</span>
+                                            <span className="pay-label">Cash (Coming Soon)</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    className="op-place-btn"
+                                    disabled={cartItems.length === 0 || orderPlacing}
+                                >
+                                    {orderPlacing
+                                        ? <><i className="fas fa-spinner fa-spin"></i> Processing...</>
+                                        : <><i className="fas fa-lock"></i> Pay Securely — Rs.{finalTotal}</>
+                                    }
+                                </button>
+
+                                <p style={{ textAlign: 'center', fontSize: '0.78rem', color: '#888', margin: '8px 0 0' }}>
+                                    <i className="fab fa-whatsapp" style={{ color: '#25D366', marginRight: '4px' }}></i>
+                                    Order details will be sent to our WhatsApp after payment
+                                </p>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* ──── PREMIUM MENU SUGGESTIONS ──── */}
+            <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '20px 16px 60px' }}>
+                <h2 style={{ fontSize: '1.5rem', fontWeight: 900, color: '#111', margin: '0 0 20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    🍕 Add More Delicious Items
+                </h2>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '16px' }}>
+                    {[
+                        { id: 's1', name: 'Margherita Pizza', price: 150, image: pizzaImg1, selectedSize: 'medium' },
+                        { id: 's2', name: 'Cheesy Burger', price: 120, image: burgerImg, selectedSize: 'regular' },
+                        { id: 's3', name: 'Butter Scotch Shake', price: 90, image: shakeImg, selectedSize: 'regular' },
+                        { id: 's4', name: 'Friends Meal Combo', price: 100, image: offer2, selectedSize: 'regular' },
+                        { id: 's5', name: 'Family Combo', price: 340, image: offer3, selectedSize: 'regular' },
+                        { id: 's6', name: 'Cheesy Garlic Bread', price: 80, image: garlic, selectedSize: 'regular' },
+                    ].map(item => (
+                        <div key={item.id} style={{
+                            background: '#fff', borderRadius: '18px', overflow: 'hidden',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.08)', transition: 'transform 0.3s',
+                            display: 'flex', flexDirection: 'column'
+                        }}
+                            onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-4px)'}
+                            onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
+                            <img src={item.image} alt={item.name} style={{ width: '100%', height: '120px', objectFit: 'cover' }} />
+                            <div style={{ padding: '12px' }}>
+                                <div style={{ fontWeight: 700, fontSize: '0.88rem', color: '#222', marginBottom: '6px', lineHeight: 1.3 }}>{item.name}</div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <span style={{ fontWeight: 800, color: '#e31837', fontSize: '1rem' }}>₹{item.price}</span>
+                                    <button
+                                        onClick={() => addToCart({
+                                            id: item.id,
+                                            name: item.name,
+                                            price: item.price,
+                                            image: item.image,
+                                            selectedSize: item.selectedSize
+                                        })}
+                                        style={{
+                                            background: '#e31837', color: '#fff', border: 'none', borderRadius: '8px',
+                                            padding: '6px 12px', fontWeight: 800, fontSize: '0.9rem', cursor: 'pointer',
+                                            fontFamily: 'inherit', transition: 'background 0.2s'
+                                        }}
+                                        onMouseEnter={e => e.target.style.background = '#c5122b'}
+                                        onMouseLeave={e => e.target.style.background = '#e31837'}
+                                    >+ Add</button>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default Order;
+

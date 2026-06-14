@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <!-- Captain Pizza Favicon — uses the real brand logo -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/logo.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/logo.png" />
+  <link rel="shortcut icon" href="/logo.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/logo.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#B71C1C" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
+  <!-- SEO Meta Tags -->
+  <title>Captain Pizza — Hot, Fresh &amp; Delicious</title>
+  <meta name="description"
+    content="Order fresh, hot pizzas online from Captain Pizza. Customizable toppings, cheese burst crusts, combo meals and more. Fast delivery!" />
+  <meta name="keywords" content="Captain Pizza, pizza order online, cheese burst pizza, veg pizza, pizza delivery" />
+  <meta name="author" content="Captain Pizza" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Aggressive Cache Buster for Cross-Device Updates -->
+  <script>
+    (function() {
+      var APP_VERSION = "v12.0.0"; // MUST increment this to force clear cache
+      var savedVersion = localStorage.getItem('app_version');
+      
+      if (savedVersion !== APP_VERSION) {
+        // Clear LocalStorage safely (optional, but good for fresh states, keeping auth if needed)
+        // localStorage.clear(); // We won't clear auth, just update version.
+        localStorage.setItem('app_version', APP_VERSION);
+        
+        // Aggressively clear modern Cache API
+        if ('caches' in window) {
+          caches.keys().then(function(names) {
+            for (let name of names) caches.delete(name);
+          });
+        }
+        
+        // Force hard reload using query string trick to bypass service workers/ISP cache
+        var currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set('v', APP_VERSION);
+        window.location.replace(currentUrl.href);
+      }
+    })();
+  </script>
+
+  <!-- Open Graph for social sharing & Google Search preview -->
+  <meta property="og:title" content="Captain Pizza — Hot, Fresh &amp; Delicious" />
+  <meta property="og:description" content="Order fresh, hot pizzas online. Customizable toppings, fast delivery!" />
+  <meta property="og:image" content="/logo.png" />
+  <meta property="og:image:width" content="512" />
+  <meta property="og:image:height" content="512" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:image" content="/logo.png" />
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- Razorpay Payment SDK -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
+</html>

@@ -64,6 +64,21 @@ if %errorlevel% neq 0 (
     "%GIT_CMD%" remote add origin "https://github.com/Aajay1990/Captain-Pizza.git" >> build_and_push_log.txt 2>&1
 )
 
+:: Remove submodule Git folders if they exist
+if exist "backend\.git" (
+    echo Removing nested .git folder from backend to prevent submodule issues...
+    echo Removing backend\.git >> build_and_push_log.txt
+    rmdir /s /q "backend\.git" >> build_and_push_log.txt 2>&1
+    "%GIT_CMD%" rm --cached -f backend >> build_and_push_log.txt 2>&1
+)
+
+if exist "frontend\.git" (
+    echo Removing nested .git folder from frontend to prevent submodule issues...
+    echo Removing frontend\.git >> build_and_push_log.txt
+    rmdir /s /q "frontend\.git" >> build_and_push_log.txt 2>&1
+    "%GIT_CMD%" rm --cached -f frontend >> build_and_push_log.txt 2>&1
+)
+
 echo [1/5] Git status: >> build_and_push_log.txt
 "%GIT_CMD%" status >> build_and_push_log.txt 2>&1
 

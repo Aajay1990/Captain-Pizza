@@ -2,38 +2,29 @@ Running build and push process...
 ==================================== 
 Using system git. 
  
-Setting global email to "captainpizzadayalpur@gmail.com" 
-Setting global name to "Aajay1990" 
+Removing backend\.git 
+rm 'backend'
+Removing frontend\.git 
+rm 'frontend'
 [1/5] Git status: 
 On branch main
-
-No commits yet
+Your branch is up to date with 'origin/main'.
 
 Changes to be committed:
-  (use "git rm --cached <file>..." to unstage)
-	new file:   backend
-	new file:   build_and_push.bat
-	new file:   build_and_push_log.txt
-	new file:   check_dot_git.bat
-	new file:   debug_push.bat
-	new file:   find_any_git.bat
-	new file:   find_git.bat
-	new file:   frontend
-	new file:   git_debug_log.txt
-	new file:   git_deep_search_log.txt
-	new file:   git_search_log.txt
-	new file:   start_localhost.bat
-	new file:   test_node.js
-	new file:   test_out.txt
+  (use "git restore --staged <file>..." to unstage)
+	deleted:    backend
+	deleted:    frontend
 
 Changes not staged for commit:
   (use "git add <file>..." to update what will be committed)
   (use "git restore <file>..." to discard changes in working directory)
-  (commit or discard the untracked or modified content in submodules)
-	modified:   backend (modified content, untracked content)
 	modified:   build_and_push.bat
 	modified:   build_and_push_log.txt
-	modified:   frontend (modified content, untracked content)
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	backend/
+	frontend/
 
 [2/5] Building frontend... 
 
@@ -119,6 +110,6 @@ computing gzip size...
 [2mdist/[22m[36massets/ui-BmiKgtxB.js                            [39m[1m[2m    0.79 kB[22m[1m[22m[2m │ gzip:  0.50 kB[22m
 [2mdist/[22m[36massets/react-Cxj_KmsH.js                         [39m[1m[2m  178.04 kB[22m[1m[22m[2m │ gzip: 58.40 kB[22m
 [2mdist/[22m[36massets/index-liP8Zmvx.js                         [39m[1m[2m  255.23 kB[22m[1m[22m[2m │ gzip: 71.35 kB[22m
-[32m✓ built in 3.26s[39m
+[32m✓ built in 3.32s[39m
 Build succeeded. 
 [3/5] Staging changes... 

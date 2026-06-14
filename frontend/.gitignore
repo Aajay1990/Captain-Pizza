@@ -1,0 +1,8 @@
+node_modules/
+# dist/ removed to allow deployment
+.env
+*.log
+*.zip
+src_backup/
+null/
+frontend_build/
