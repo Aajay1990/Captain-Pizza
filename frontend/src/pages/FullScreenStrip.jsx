@@ -207,9 +207,6 @@ const FullScreenStrip = () => {
                                             </>
                                         )}
                                     </div>
-                                    {item.couponCode && (
-                                        <div className="tv-coupon-badge">PROMO CODE: {item.couponCode}</div>
-                                    )}
                                     <div className="tv-card-overlay">
                                         <div className="tv-item-header">
                                             <span className="tv-veg-indicator" style={{ borderColor: item.isBogo ? '#f59e0b' : '#22c55e' }}>
@@ -218,6 +215,9 @@ const FullScreenStrip = () => {
                                             <h2 className="tv-item-name">{item.title}</h2>
                                         </div>
                                         <p className="tv-item-desc">{item.desc}</p>
+                                        {item.couponCode && (
+                                            <div className="tv-coupon-badge">PROMO CODE: {item.couponCode}</div>
+                                        )}
                                         <div className="tv-item-footer">
                                             {item.price ? <span className="tv-price">₹{item.price.toLocaleString('en-IN')}</span> : <span className="tv-price">BOGO</span>}
                                             <span className="tv-order-instruction">ORDER NOW AT THE COUNTER 🌟</span>
@@ -246,9 +246,6 @@ const FullScreenStrip = () => {
                                             </>
                                         )}
                                     </div>
-                                    {item.couponCode && (
-                                        <div className="tv-coupon-badge">PROMO CODE: {item.couponCode}</div>
-                                    )}
                                     <div className="tv-card-overlay">
                                         <div className="tv-item-header">
                                             <span className="tv-veg-indicator" style={{ borderColor: item.isBogo ? '#f59e0b' : '#22c55e' }}>
@@ -257,11 +254,15 @@ const FullScreenStrip = () => {
                                             <h2 className="tv-item-name">{item.title}</h2>
                                         </div>
                                         <p className="tv-item-desc">{item.desc}</p>
+                                        {item.couponCode && (
+                                            <div className="tv-coupon-badge">PROMO CODE: {item.couponCode}</div>
+                                        )}
                                         <div className="tv-item-footer">
                                             {item.price ? <span className="tv-price">₹{item.price.toLocaleString('en-IN')}</span> : <span className="tv-price">BOGO</span>}
                                             <span className="tv-order-instruction">ORDER NOW AT THE COUNTER 🌟</span>
                                         </div>
                                     </div>
+
                                 </div>
                             ))}
                         </div>

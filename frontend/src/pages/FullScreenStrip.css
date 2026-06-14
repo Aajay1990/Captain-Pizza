@@ -278,19 +278,19 @@
 
 /* Promo Overlay */
 .tv-coupon-badge {
-    position: absolute;
-    bottom: 215px;
-    right: 25px;
-    background: rgba(225, 29, 72, 0.9);
+    display: inline-block;
+    align-self: flex-start;
+    background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
     color: #fff;
-    padding: 8px 18px;
-    border-radius: 16px;
-    font-size: 0.95rem;
+    padding: 6px 14px;
+    border-radius: 10px;
+    font-size: 0.85rem;
     font-weight: 900;
-    border: 1px solid rgba(255,255,255,0.2);
-    box-shadow: 0 4px 15px rgba(225, 29, 72, 0.5);
-    z-index: 5;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 12px rgba(225, 29, 72, 0.4);
+    margin-bottom: 12px;
     letter-spacing: 0.5px;
+    box-sizing: border-box;
 }
 
 /* Card details overlay */
@@ -299,9 +299,8 @@
     bottom: 0;
     left: 0;
     right: 0;
-    height: 35%;
-    padding: 18px 24px 22px;
-    background: linear-gradient(to top, rgba(0,0,0,0.99) 0%, rgba(0,0,0,0.95) 40%, rgba(0,0,0,0.75) 70%, transparent 100%);
+    padding: 30px 24px 22px;
+    background: linear-gradient(to top, rgba(0,0,0,0.99) 0%, rgba(0,0,0,0.95) 60%, rgba(0,0,0,0.75) 85%, transparent 100%);
     color: #fff;
     display: flex;
     flex-direction: column;
