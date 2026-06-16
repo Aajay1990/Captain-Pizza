@@ -13,6 +13,8 @@ const Menu = () => {
     const [activeSection, setActiveSection] = useState('specialOffers');
     const { addToCart, setIsCartOpen } = useContext(CartContext);
     const sectionRefs = useRef({});
+    const isManualScrolling = useRef(false);
+    const scrollTimeout = useRef(null);
     const [dbItems, setDbItems] = useState([]);
     const [apiLoading, setApiLoading] = useState(true);
     const [apiSlow, setApiSlow] = useState(false);
@@ -42,13 +44,19 @@ const Menu = () => {
         }
         if (location.state?.scrollTo) {
             const targetId = location.state.scrollTo;
+            isManualScrolling.current = true;
             const timer = setTimeout(() => {
                 const el = document.getElementById(targetId) || sectionRefs.current[targetId];
                 if (el) {
-                    const y = el.getBoundingClientRect().top + window.pageYOffset - 100;
+                    const y = el.getBoundingClientRect().top + window.pageYOffset - 110;
                     window.scrollTo({ top: y, behavior: 'smooth' });
                     setActiveSection(targetId);
                 }
+                // Release scroll lock after smooth scrolling completes
+                if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+                scrollTimeout.current = setTimeout(() => {
+                    isManualScrolling.current = false;
+                }, 800);
             }, 600);
             window.history.replaceState({}, document.title);
             return () => clearTimeout(timer);
@@ -189,37 +197,69 @@ const Menu = () => {
 
     useEffect(() => {
         const handleScroll = () => {
-            const scrollPosition = window.scrollY + 220;
-            for (let i = allCategories.length - 1; i >= 0; i--) {
+            if (isManualScrolling.current) return;
+
+            // Highlight first category when scrolled near the top
+            if (window.scrollY < 50) {
+                const firstCat = allCategories.find(c => c.type !== 'header');
+                if (firstCat) {
+                    setActiveSection(firstCat.id);
+                    return;
+                }
+            }
+
+            // Highlight last category when scrolled to the very bottom
+            if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 20) {
+                const validCategories = allCategories.filter(c => c.type !== 'header' && sectionRefs.current[c.id]);
+                if (validCategories.length > 0) {
+                    const lastCat = validCategories[validCategories.length - 1];
+                    setActiveSection(lastCat.id);
+                    return;
+                }
+            }
+
+            let currentSectionId = '';
+            for (let i = 0; i < allCategories.length; i++) {
                 const category = allCategories[i];
                 const element = sectionRefs.current[category.id];
                 if (element) {
                     const elementTop = element.getBoundingClientRect().top + window.pageYOffset;
-                    if (elementTop <= scrollPosition) {
-                        setActiveSection(prev => {
-                            if (prev !== category.id) {
-                                const btn = document.getElementById(`nav-btn-${category.id}`);
-                                if (btn && window.innerWidth <= 960) btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-                                return category.id;
-                            }
-                            return prev;
-                        });
-                        break;
+                    if (elementTop - 130 <= window.scrollY) {
+                        currentSectionId = category.id;
                     }
                 }
             }
+
+            if (currentSectionId) {
+                setActiveSection(prev => {
+                    if (prev !== currentSectionId) {
+                        const btn = document.getElementById(`nav-btn-${currentSectionId}`);
+                        if (btn && window.innerWidth <= 960) btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                        return currentSectionId;
+                    }
+                    return prev;
+                });
+            }
         };
         window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+        };
     }, [allCategories]);
 
     const scrollToSection = (id) => {
+        isManualScrolling.current = true;
         setActiveSection(id);
         const element = sectionRefs.current[id];
         if (element) {
-            const y = element.getBoundingClientRect().top + window.pageYOffset - 100;
+            const y = element.getBoundingClientRect().top + window.pageYOffset - 110;
             window.scrollTo({ top: y, behavior: 'smooth' });
         }
+        if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+        scrollTimeout.current = setTimeout(() => {
+            isManualScrolling.current = false;
+        }, 800);
     };
 
     const handleAddToCart = (item) => { addToCart(item); };

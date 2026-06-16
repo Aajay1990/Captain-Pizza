@@ -479,7 +479,7 @@ const OfferManager = () => {
                                                 <p style={{ margin: 0, fontWeight: '700', color: '#555' }}>
                                                     {formData.bannerImage ? '🔄 Click to RENEW / Change Image' : '📸 Click to Upload Banner Image'}
                                                 </p>
-                                                <span style={{ fontSize: '0.75rem', color: '#999' }}>JPG, PNG, WEBP — Recommended: 542×592px</span>
+                                                <span style={{ fontSize: '0.75rem', color: '#999' }}>JPG, PNG, WEBP — Recommended: 1000×500px (2:1 landscape banner) so it fits perfectly without cropping.</span>
                                             </div>
                                         </div>
                                     )}

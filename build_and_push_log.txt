@@ -10,13 +10,13 @@ Changes not staged for commit:
   (use "git add <file>..." to update what will be committed)
   (use "git restore <file>..." to discard changes in working directory)
   (commit or discard the untracked or modified content in submodules)
+	modified:   build_and_push.bat
 	modified:   build_and_push_log.txt
 	modified:   frontend/backend_v10_final (modified content)
 	modified:   frontend/backend_v13_final (modified content)
 	modified:   frontend/backend_v9_final (modified content)
-	modified:   frontend/src/App.css
-	modified:   frontend/src/App.jsx
-	modified:   frontend/src/pages/FullScreenStrip.jsx
+	modified:   frontend/src/pages/Menu.jsx
+	modified:   frontend/src/pages/admin/OfferManager.jsx
 
 no changes added to commit (use "git add" and/or "git commit -a")
 [2/5] Building frontend... 
@@ -102,7 +102,7 @@ computing gzip size...
 [2mdist/[22m[35massets/index-B5jnjYX-.css                        [39m[1m[2m   96.53 kB[22m[1m[22m[2m │ gzip: 19.46 kB[22m
 [2mdist/[22m[36massets/ui-BmiKgtxB.js                            [39m[1m[2m    0.79 kB[22m[1m[22m[2m │ gzip:  0.50 kB[22m
 [2mdist/[22m[36massets/react-Cxj_KmsH.js                         [39m[1m[2m  178.04 kB[22m[1m[22m[2m │ gzip: 58.40 kB[22m
-[2mdist/[22m[36massets/index-BVMDIVuX.js                         [39m[1m[2m  255.72 kB[22m[1m[22m[2m │ gzip: 71.41 kB[22m
-[32m✓ built in 3.28s[39m
+[2mdist/[22m[36massets/index-yQfh8dsG.js                         [39m[1m[2m  256.32 kB[22m[1m[22m[2m │ gzip: 71.60 kB[22m
+[32m✓ built in 3.96s[39m
 Build succeeded. 
 [3/5] Staging changes... 
