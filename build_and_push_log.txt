@@ -16,7 +16,6 @@ Changes not staged for commit:
 	modified:   frontend/backend_v13_final (modified content)
 	modified:   frontend/backend_v9_final (modified content)
 	modified:   frontend/src/pages/Menu.jsx
-	modified:   frontend/src/pages/admin/OfferManager.jsx
 
 no changes added to commit (use "git add" and/or "git commit -a")
 [2/5] Building frontend... 
@@ -102,7 +101,7 @@ computing gzip size...
 [2mdist/[22m[35massets/index-B5jnjYX-.css                        [39m[1m[2m   96.53 kB[22m[1m[22m[2m │ gzip: 19.46 kB[22m
 [2mdist/[22m[36massets/ui-BmiKgtxB.js                            [39m[1m[2m    0.79 kB[22m[1m[22m[2m │ gzip:  0.50 kB[22m
 [2mdist/[22m[36massets/react-Cxj_KmsH.js                         [39m[1m[2m  178.04 kB[22m[1m[22m[2m │ gzip: 58.40 kB[22m
-[2mdist/[22m[36massets/index-yQfh8dsG.js                         [39m[1m[2m  256.32 kB[22m[1m[22m[2m │ gzip: 71.60 kB[22m
-[32m✓ built in 3.96s[39m
+[2mdist/[22m[36massets/index-YedECJvd.js                         [39m[1m[2m  256.41 kB[22m[1m[22m[2m │ gzip: 71.63 kB[22m
+[32m✓ built in 3.26s[39m
 Build succeeded. 
 [3/5] Staging changes... 

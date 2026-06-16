@@ -234,7 +234,16 @@ const Menu = () => {
                 setActiveSection(prev => {
                     if (prev !== currentSectionId) {
                         const btn = document.getElementById(`nav-btn-${currentSectionId}`);
-                        if (btn && window.innerWidth <= 960) btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                        if (btn && window.innerWidth <= 960) {
+                            const sidebarEl = document.querySelector('.menu-sidebar');
+                            if (sidebarEl) {
+                                const containerWidth = sidebarEl.clientWidth;
+                                const btnOffsetLeft = btn.offsetLeft;
+                                const btnWidth = btn.clientWidth;
+                                const newScrollLeft = btnOffsetLeft - (containerWidth / 2) + (btnWidth / 2);
+                                sidebarEl.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
+                            }
+                        }
                         return currentSectionId;
                     }
                     return prev;

@@ -98,7 +98,7 @@ echo [3/5] Staging changes... >> build_and_push_log.txt
 "%GIT_CMD%" add -A >> build_and_push_log.txt 2>&1
 
 echo [4/5] Committing changes... >> build_and_push_log.txt
-"%GIT_CMD%" commit -m "feat: fix menu scrolling and update admin special offer recommended photo size to 1000x500px" >> build_and_push_log.txt 2>&1
+"%GIT_CMD%" commit -m "feat: fix menu scrolling jitter on mobile, update admin special offer recommended photo size to 1000x500px" >> build_and_push_log.txt 2>&1
 
 echo [5/5] Pushing to GitHub... >> build_and_push_log.txt
 "%GIT_CMD%" push -u origin main >> build_and_push_log.txt 2>&1
