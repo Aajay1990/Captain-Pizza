@@ -317,3 +317,294 @@
     background-color: #dc2626;
     transform: translateY(-2px);
 }
+
+/* ════════════════════════════════════════════════════════
+   New Order Popup Notification
+════════════════════════════════════════════════════════ */
+.new-order-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    backdrop-filter: blur(3px);
+    transition: opacity 0.35s ease;
+}
+
+.new-order-overlay.nop-enter { opacity: 1; pointer-events: all; }
+.new-order-overlay.nop-exit  { opacity: 0; pointer-events: none; }
+
+.new-order-popup {
+    background: #fff;
+    border-radius: 20px;
+    width: 420px;
+    max-width: 95vw;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35), 0 0 0 4px rgba(225, 29, 72, 0.15);
+    overflow: hidden;
+    font-family: 'Inter', 'Outfit', sans-serif;
+}
+
+/* Header strip */
+.nop-header {
+    background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+}
+
+.nop-bell {
+    width: 48px;
+    height: 48px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.nop-bell-icon {
+    color: #fff;
+    font-size: 1.4rem;
+    animation: nopBellShake 0.5s ease infinite alternate;
+}
+
+@keyframes nopBellShake {
+    0%   { transform: rotate(-15deg); }
+    100% { transform: rotate(15deg); }
+}
+
+.nop-title-wrap {
+    flex: 1;
+}
+
+.nop-title {
+    margin: 0;
+    color: #fff;
+    font-size: 1.15rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.nop-badge {
+    display: inline-block;
+    margin-top: 4px;
+    background: rgba(255,255,255,0.25);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.5px;
+}
+
+.nop-close {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+
+.nop-close:hover { background: rgba(255,255,255,0.35); }
+
+/* Body */
+.nop-body {
+    padding: 22px 24px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.nop-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.nop-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #94a3b8;
+}
+
+.nop-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.nop-id {
+    font-family: monospace;
+    background: #f1f5f9;
+    padding: 2px 10px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+}
+
+.nop-amount {
+    color: #e11d48;
+    font-size: 1.1rem;
+    font-weight: 800;
+}
+
+.nop-items {
+    padding-top: 4px;
+}
+
+.nop-items-list {
+    margin: 8px 0 0 0;
+    padding-left: 18px;
+    list-style: disc;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.9rem;
+    color: #374151;
+}
+
+.nop-more {
+    color: #94a3b8;
+    font-style: italic;
+    font-size: 0.82rem;
+    list-style: none;
+    margin-left: -18px;
+    padding-left: 18px;
+}
+
+/* Footer */
+.nop-footer {
+    display: flex;
+    gap: 12px;
+    padding: 16px 24px 22px;
+}
+
+.nop-btn-view {
+    flex: 1;
+    background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(225, 29, 72, 0.35);
+}
+
+.nop-btn-view:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(225, 29, 72, 0.45);
+}
+
+.nop-btn-dismiss {
+    background: #f1f5f9;
+    color: #64748b;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.nop-btn-dismiss:hover {
+    background: #e2e8f0;
+    color: #374151;
+}
+
+/* ── Alert strip at the very top of popup ── */
+.nop-alert-strip {
+    background: linear-gradient(90deg, #dc2626, #b91c1c);
+    color: #fff;
+    text-align: center;
+    padding: 7px 16px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    animation: nopStripPulse 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes nopStripPulse {
+    0%   { opacity: 1; }
+    100% { opacity: 0.65; }
+}
+
+/* ── Queue hint at popup bottom ── */
+.nop-queue-hint {
+    background: #fef3c7;
+    color: #92400e;
+    text-align: center;
+    padding: 8px 16px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border-top: 1px solid #fde68a;
+}
+
+/* ── Overlay: no pointer on background (cannot click-outside to close) ── */
+.new-order-overlay {
+    cursor: default;
+}
+
+/* ── Pending order count badge in sidebar ── */
+.admin-pending-badge {
+    margin-left: auto;
+    background: #e11d48;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 800;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+    animation: badgePulse 1.5s ease-in-out infinite;
+    flex-shrink: 0;
+}
+
+@keyframes badgePulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.6); }
+    50%       { box-shadow: 0 0 0 5px rgba(225, 29, 72, 0); }
+}
+
+/* ── Pending indicator in admin header ── */
+.admin-header-pending {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #fef2f2;
+    color: #e11d48;
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 5px 14px;
+    border-radius: 999px;
+    border: 1px solid #fecaca;
+    margin-right: 8px;
+    animation: badgePulse 1.5s ease-in-out infinite;
+}

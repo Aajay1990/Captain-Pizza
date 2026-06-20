@@ -82,7 +82,26 @@ if exist "frontend\.git" (
 echo [1/5] Git status: >> build_and_push_log.txt
 "%GIT_CMD%" status >> build_and_push_log.txt 2>&1
 
+:: Check if user wants to update dependencies
+echo.
+set "INSTALL_CHOICE=n"
+set /p INSTALL_CHOICE="Do you want to run 'npm install' for backend and frontend? (y/n, default: n): "
+if /i "%INSTALL_CHOICE%"=="y" (
+    echo [1.5/5] Installing backend dependencies... >> build_and_push_log.txt
+    echo Installing backend dependencies...
+    cd backend
+    call npm install >> ..\build_and_push_log.txt 2>&1
+    cd ..
+    
+    echo [1.6/5] Installing frontend dependencies... >> build_and_push_log.txt
+    echo Installing frontend dependencies...
+    cd frontend
+    call npm install >> ..\build_and_push_log.txt 2>&1
+    cd ..
+)
+
 echo [2/5] Building frontend... >> build_and_push_log.txt
+echo Building frontend...
 cd frontend
 call npm run build >> ..\build_and_push_log.txt 2>&1
 if %errorlevel% neq 0 (
@@ -94,11 +113,35 @@ if %errorlevel% neq 0 (
 cd ..
 echo Build succeeded. >> build_and_push_log.txt
 
+echo [2.5/5] Updating root dist folder... >> build_and_push_log.txt
+echo Updating root dist folder...
+if exist "dist" (
+    echo Removing existing root dist folder... >> build_and_push_log.txt
+    rmdir /s /q "dist" >> build_and_push_log.txt 2>&1
+)
+echo Copying frontend/dist to root dist folder... >> build_and_push_log.txt
+xcopy /e /i /y "frontend\dist" "dist" >> build_and_push_log.txt 2>&1
+if %errorlevel% neq 0 (
+    echo WARNING: Failed to copy frontend/dist to root dist folder. >> build_and_push_log.txt
+) else (
+    echo Root dist folder updated successfully. >> build_and_push_log.txt
+)
+
+echo.
+echo ========================================================
+echo  ENTER COMMIT MESSAGE
+echo ========================================================
+set "COMMIT_MSG="
+set /p COMMIT_MSG="Enter commit message (or press Enter for default): "
+if "%COMMIT_MSG%"=="" (
+    set COMMIT_MSG=Update backend and frontend dist folder
+)
+
 echo [3/5] Staging changes... >> build_and_push_log.txt
 "%GIT_CMD%" add -A >> build_and_push_log.txt 2>&1
 
 echo [4/5] Committing changes... >> build_and_push_log.txt
-"%GIT_CMD%" commit -m "feat: fix menu scrolling jitter on mobile, update admin special offer recommended photo size to 1000x500px" >> build_and_push_log.txt 2>&1
+"%GIT_CMD%" commit -m "%COMMIT_MSG%" >> build_and_push_log.txt 2>&1
 
 echo [5/5] Pushing to GitHub... >> build_and_push_log.txt
 "%GIT_CMD%" push -u origin main >> build_and_push_log.txt 2>&1

@@ -10,14 +10,58 @@ Changes not staged for commit:
   (use "git add <file>..." to update what will be committed)
   (use "git restore <file>..." to discard changes in working directory)
   (commit or discard the untracked or modified content in submodules)
+	modified:   backend/server.js
 	modified:   build_and_push.bat
 	modified:   build_and_push_log.txt
 	modified:   frontend/backend_v10_final (modified content)
 	modified:   frontend/backend_v13_final (modified content)
 	modified:   frontend/backend_v9_final (modified content)
-	modified:   frontend/src/pages/Menu.jsx
+	modified:   frontend/src/App.jsx
+	modified:   frontend/src/pages/FullScreenStrip.css
+	modified:   frontend/src/pages/FullScreenStrip.jsx
+	modified:   frontend/src/pages/admin/AdminDashboard.css
+	modified:   frontend/src/pages/admin/AdminDashboard.jsx
+	modified:   frontend/src/pages/admin/SettingsManager.jsx
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	backend/uploads/image-1781979254462-650276557.png
+	frontend/src/pages/StoreClosedModal.css
+	frontend/src/pages/StoreClosedModal.jsx
 
 no changes added to commit (use "git add" and/or "git commit -a")
+[1.5/5] Installing backend dependencies... 
+
+up to date, audited 165 packages in 5s
+
+26 packages are looking for funding
+  run `npm fund` for details
+
+11 vulnerabilities (5 moderate, 6 high)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+[1.6/5] Installing frontend dependencies... 
+
+up to date, audited 284 packages in 3s
+
+113 packages are looking for funding
+  run `npm fund` for details
+
+3 vulnerabilities (1 moderate, 2 high)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
 [2/5] Building frontend... 
 
 > frontend@0.0.0 build
@@ -25,10 +69,13 @@ no changes added to commit (use "git add" and/or "git commit -a")
 
 [36mvite v5.4.21 [32mbuilding for production...[36m[39m
 transforming...
-[32m✓[39m 1907 modules transformed.
+[32m✓[39m 1910 modules transformed.
 rendering chunks...
+[1m[33m[plugin:vite:reporter][39m[22m [33m[plugin vite:reporter] 
+(!) C:/Users/lpawa/Downloads/captain pizza/frontend/src/apiConfig.js is dynamically imported by C:/Users/lpawa/Downloads/captain pizza/frontend/src/pages/admin/AdminDashboard.jsx but also statically imported by C:/Users/lpawa/Downloads/captain pizza/frontend/src/components/CartDrawer.jsx, C:/Users/lpawa/Downloads/captain pizza/frontend/src/context/AuthContext.jsx, C:/Users/lpawa/Downloads/captain pizza/frontend/src/pages/ForgotPassword.jsx, C:/Users/lpawa/Downloads/captain pizza/frontend/src/pages/FullScreenStrip.jsx, C:/Users/lpawa/Downloads/captain pizza/frontend/src/pages/Home.jsx, C:/Users/lpawa/Downloads/captain pizza/frontend/src/pages/Menu.jsx, C:/Users/lpawa/Downloads/captain pizza/frontend/src/pages/Order.jsx, C:/Users/lpawa/Downloads/captain pizza/frontend/src/pages/OrderHistory.jsx, C:/Users/lpawa/Downloads/captain pizza/frontend/src/pages/StoreClosedModal.jsx, C:/Users/lpawa/Downloads/captain pizza/frontend/src/pages/UserProfile.jsx, C:/Users/lpawa/Downloads/captain pizza/frontend/src/pages/VerifyEmail.jsx, C:/Users/lpawa/Downloads/captain pizza/frontend/src/pages/admin/DashboardStats.jsx, C:/Users/lpawa/Downloads/captain pizza/frontend/src/pages/admin/MenuManager.jsx, C:/Users/lpawa/Downloads/captain pizza/frontend/src/pages/admin/OfferManager.jsx, dynamic import will not move module into another chunk.
+[39m
 computing gzip size...
-[2mdist/[22m[32mindex.html                                       [39m[1m[2m    3.39 kB[22m[1m[22m[2m │ gzip:  1.40 kB[22m
+[2mdist/[22m[32mindex.html                                       [39m[1m[2m    3.39 kB[22m[1m[22m[2m │ gzip:  1.39 kB[22m
 [2mdist/[22m[32massets/qr code-sXZXiSBy.png                      [39m[1m[2m   33.39 kB[22m[1m[22m
 [2mdist/[22m[32massets/logo-sFvzCCTw.png                         [39m[1m[2m   58.18 kB[22m[1m[22m
 [2mdist/[22m[32massets/VANILA SHAKE-CbfiXqbF.png                 [39m[1m[2m  126.28 kB[22m[1m[22m
@@ -98,10 +145,93 @@ computing gzip size...
 [2mdist/[22m[32massets/Family Combo-Cy-MAq0M.png                 [39m[1m[2m1,701.02 kB[22m[1m[22m
 [2mdist/[22m[32massets/SWEET CORN-BcFwkwqd.png                   [39m[1m[2m1,725.42 kB[22m[1m[22m
 [2mdist/[22m[32massets/Super Value Friends Meal-C6O1Jl_J.png     [39m[1m[2m1,805.01 kB[22m[1m[22m
-[2mdist/[22m[35massets/index-B5jnjYX-.css                        [39m[1m[2m   96.53 kB[22m[1m[22m[2m │ gzip: 19.46 kB[22m
+[2mdist/[22m[35massets/index-8un_EpBH.css                        [39m[1m[2m  103.18 kB[22m[1m[22m[2m │ gzip: 20.69 kB[22m
 [2mdist/[22m[36massets/ui-BmiKgtxB.js                            [39m[1m[2m    0.79 kB[22m[1m[22m[2m │ gzip:  0.50 kB[22m
 [2mdist/[22m[36massets/react-Cxj_KmsH.js                         [39m[1m[2m  178.04 kB[22m[1m[22m[2m │ gzip: 58.40 kB[22m
-[2mdist/[22m[36massets/index-YedECJvd.js                         [39m[1m[2m  256.41 kB[22m[1m[22m[2m │ gzip: 71.63 kB[22m
-[32m✓ built in 3.26s[39m
+[2mdist/[22m[36massets/index-BMfthRIS.js                         [39m[1m[2m  265.61 kB[22m[1m[22m[2m │ gzip: 74.82 kB[22m
+[32m✓ built in 4.51s[39m
 Build succeeded. 
+[2.5/5] Updating root dist folder... 
+Copying frontend/dist to root dist folder... 
+frontend\dist\.htaccess
+frontend\dist\favicon.ico
+frontend\dist\favicon.png
+frontend\dist\index.html
+frontend\dist\logo.png
+frontend\dist\_redirects
+frontend\dist\assets\2 IN 1 PIZZA-BPJaLVMP.png
+frontend\dist\assets\BLUE OCEAN-B_B8MDQL.png
+frontend\dist\assets\BUTTER SCOTCH SHAKE -1hCfG49I.png
+frontend\dist\assets\CHEESE GRILL SANDWICH-HmrMA9eF.png
+frontend\dist\assets\CHEESE MAGGI-lZHdBiKK.png
+frontend\dist\assets\CHEESY BURGER-r3DfMRPI.png
+frontend\dist\assets\CHEESY GARLIC BREAD-Db3kAtFV.png
+frontend\dist\assets\CHEF_S VEG SPECIAL PIZZA-DSc1SuJT.png
+frontend\dist\assets\CHILLY SAUCE PASTA-DecJn9RV.png
+frontend\dist\assets\CHOCOLATE SHAKE-CGwFZLLk.png
+frontend\dist\assets\CLASSIC VEG WRAP-B5T7676j.png
+frontend\dist\assets\CLASSIC VEG-BDew9-m5.png
+frontend\dist\assets\COLD COFFEE-DU4J7YIg.png
+frontend\dist\assets\CRISPY VEG WRAP-Dq-zIo8z.png
+frontend\dist\assets\CRISPY VEG-BF41Atp_.png
+frontend\dist\assets\EXTRAVAGANZA VEG-CFZFziZI.png
+frontend\dist\assets\Family Combo-Cy-MAq0M.png
+frontend\dist\assets\FARM HOUSE-Do_2cCPv.png
+frontend\dist\assets\FRENCH FRIES-DfOJtJGK.png
+frontend\dist\assets\GOLDEN CORN VEG-BsAvN6Dx.png
+frontend\dist\assets\GOLDEN LOVER -DgnPsaOj.png
+frontend\dist\assets\GOLDEN PARADISE-B3QfDC26.png
+frontend\dist\assets\GREEN APPLE-BIwgODqo.png
+frontend\dist\assets\hero-premium-pizza-BzCpwIch.png
+frontend\dist\assets\hero-user-pizza-TeHehsFi.jpg
+frontend\dist\assets\index-8un_EpBH.css
+frontend\dist\assets\index-BMfthRIS.js
+frontend\dist\assets\instgram logo-qPap0a3R.png
+frontend\dist\assets\LEAMON ICE TEA-BeTP5tvb.png
+frontend\dist\assets\logo-sFvzCCTw.png
+frontend\dist\assets\luxury-hero-pizza-BWunWtcg.png
+frontend\dist\assets\MAKHANI SAUCE PASTA-CCQaIHnl.png
+frontend\dist\assets\MASALA SODA-DCKFMSX1.png
+frontend\dist\assets\MAXICAN SPECIAL-BCvj0wb8.png
+frontend\dist\assets\MAXICAN SPECIAL2-BUi43Ios.png
+frontend\dist\assets\MERGHERITA-D5TS4pf9.png
+frontend\dist\assets\MINT MOJITO-C2D2ZEnC.png
+frontend\dist\assets\MIX MASTI VEG-C-GLHkih.png
+frontend\dist\assets\MONSTER CLUB WRAP-DMRv4ZHZ.png
+frontend\dist\assets\MONSTER CLUB-Z9J5gvY7.png
+frontend\dist\assets\ONION-Yblglm4K.png
+frontend\dist\assets\ONION_ JALAPENO-jQio3A26.png
+frontend\dist\assets\OREO SHAKE-Dy-npiXl.png
+frontend\dist\assets\PANEER WRAP-BPdzmSEi.png
+frontend\dist\assets\Paneer _ Onion-CIRhc8Rp.png
+frontend\dist\assets\PERI PERI FRIES-ClpFDiG3.png
+frontend\dist\assets\pizza menu 1-C6M9EJKI.png
+frontend\dist\assets\pizza menu 2-DnjiEF3N.png
+frontend\dist\assets\qr code-sXZXiSBy.png
+frontend\dist\assets\react-Cxj_KmsH.js
+frontend\dist\assets\RED SAUCE PASTA-B35D0m82.png
+frontend\dist\assets\SPICY STUFFED GARLIC BREAD-BR9Pp8TO.png
+frontend\dist\assets\SPICY VEG-DCZUUqcw.png
+frontend\dist\assets\SPICY WONDER-B7qgkEi9.png
+frontend\dist\assets\SPL. DELUXE VEG-Bgwkhi_9.png
+frontend\dist\assets\SPL. DOUBLE CHEES MARGERITA-DwvcrZ3t.png
+frontend\dist\assets\SPL. MAKHANI PANEER-RUZkAoit.png
+frontend\dist\assets\SPL. PUNJABI PANEER MASTI-PKdvkYUJ.png
+frontend\dist\assets\SPL. SPICY PEPPY PANEER-3yDVKV93.png
+frontend\dist\assets\SPL. SUPREME VEG-DR7QLJA9.png
+frontend\dist\assets\STRAWBERRY SHAKE-Dbo9Vy3U.png
+frontend\dist\assets\Super Value Friends Meal-C6O1Jl_J.png
+frontend\dist\assets\SWEET CORN-BcFwkwqd.png
+frontend\dist\assets\TANDOORI SAUCE PASTA-rLiiGbUl.png
+frontend\dist\assets\TOMATO _ CAPSICUM-FEcSegn4.png
+frontend\dist\assets\TOMATO-BeuvbiCd.png
+frontend\dist\assets\ui-BmiKgtxB.js
+frontend\dist\assets\VANILA SHAKE-CbfiXqbF.png
+frontend\dist\assets\VEG TIKKI BURGER-CFAGfajJ.png
+frontend\dist\assets\VEG TIKKI WRAP-DgqWX4o3.png
+frontend\dist\assets\VEG. GRILL SANDWICH-wfjnMR0y.png
+frontend\dist\assets\WATERMELON -CMA6RMVm.png
+frontend\dist\assets\WHITE SAUCE PASTA-ByuhqDWf.png
+79 File(s) copied
+Root dist folder updated successfully. 
 [3/5] Staging changes... 

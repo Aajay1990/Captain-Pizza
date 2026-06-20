@@ -167,7 +167,7 @@ const FullScreenStrip = () => {
     return (
         <div className="tv-signage-page" style={{ cursor: showControls ? 'default' : 'none' }}>
             {/* Header / Branding */}
-            <div className={`tv-header-bar ${showControls ? 'visible' : 'hidden'}`}>
+            <div className={`tv-header-bar ${(!isFullscreen && !showControls) ? 'hidden' : 'visible'}`}>
                 <div className="tv-logo-area">
                     <img src={logo} alt="Captain Pizza" className="tv-logo" />
                     <div>
@@ -176,10 +176,12 @@ const FullScreenStrip = () => {
                     </div>
                 </div>
                 <div className="tv-actions">
-                    <button className="tv-control-btn" onClick={toggleFullscreen}>
-                        <i className={isFullscreen ? 'fas fa-compress' : 'fas fa-expand'}></i>
-                        {isFullscreen ? ' Exit Fullscreen' : ' Fullscreen'}
-                    </button>
+                    {/* Only show Fullscreen button when NOT already in fullscreen */}
+                    {!isFullscreen && (
+                        <button className="tv-control-btn" onClick={toggleFullscreen}>
+                            <i className="fas fa-expand"></i> Fullscreen
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -197,30 +199,19 @@ const FullScreenStrip = () => {
                                     </div>
                                     <div className="tv-image-container">
                                         {item.image && !item.image.includes('/') && !item.image.includes('http') && !item.image.includes('data:') ? (
-                                            <div style={{width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'10rem', background:'#1a1a24'}}>
+                                            <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'9rem',background:'#1a1a24'}}>
                                                 {item.image}
                                             </div>
                                         ) : (
-                                            <>
-                                                <img 
-                                                    src={item.image} 
-                                                    alt="" 
-                                                    className="tv-card-img-blur" 
-                                                    onError={(e) => {
-                                                        e.target.onerror = null;
-                                                        e.target.src = "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800";
-                                                    }}
-                                                />
-                                                <img 
-                                                    src={item.image} 
-                                                    alt={item.title} 
-                                                    className="tv-card-img-contain" 
-                                                    onError={(e) => {
-                                                        e.target.onerror = null;
-                                                        e.target.src = "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800";
-                                                    }}
-                                                />
-                                            </>
+                                            <img 
+                                                src={item.image} 
+                                                alt={item.title} 
+                                                className="tv-card-img-contain" 
+                                                onError={(e) => {
+                                                    e.target.onerror = null;
+                                                    e.target.src = "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800";
+                                                }}
+                                            />
                                         )}
                                     </div>
                                     <div className="tv-card-overlay">
@@ -235,8 +226,10 @@ const FullScreenStrip = () => {
                                             <div className="tv-coupon-badge">PROMO CODE: {item.couponCode}</div>
                                         )}
                                         <div className="tv-item-footer">
-                                            {item.price ? <span className="tv-price">₹{item.price.toLocaleString('en-IN')}</span> : <span className="tv-price">BOGO</span>}
-                                            <span className="tv-order-instruction">ORDER NOW AT THE COUNTER 🌟</span>
+                                            <span className="tv-price" style={{color:'#ffd700',WebkitTextFillColor:'#ffd700',background:'none'}}>
+                                                {item.price != null ? `₹${Number(item.price).toLocaleString('en-IN')}` : 'BOGO DEAL'}
+                                            </span>
+                                            <span className="tv-order-instruction">ORDER AT COUNTER ★</span>
                                         </div>
                                     </div>
                                 </div>
@@ -252,30 +245,19 @@ const FullScreenStrip = () => {
                                     </div>
                                     <div className="tv-image-container">
                                         {item.image && !item.image.includes('/') && !item.image.includes('http') && !item.image.includes('data:') ? (
-                                            <div style={{width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'10rem', background:'#1a1a24'}}>
+                                            <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'9rem',background:'#1a1a24'}}>
                                                 {item.image}
                                             </div>
                                         ) : (
-                                            <>
-                                                <img 
-                                                    src={item.image} 
-                                                    alt="" 
-                                                    className="tv-card-img-blur" 
-                                                    onError={(e) => {
-                                                        e.target.onerror = null;
-                                                        e.target.src = "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800";
-                                                    }}
-                                                />
-                                                <img 
-                                                    src={item.image} 
-                                                    alt={item.title} 
-                                                    className="tv-card-img-contain" 
-                                                    onError={(e) => {
-                                                        e.target.onerror = null;
-                                                        e.target.src = "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800";
-                                                    }}
-                                                />
-                                            </>
+                                            <img 
+                                                src={item.image} 
+                                                alt={item.title} 
+                                                className="tv-card-img-contain" 
+                                                onError={(e) => {
+                                                    e.target.onerror = null;
+                                                    e.target.src = "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800";
+                                                }}
+                                            />
                                         )}
                                     </div>
                                     <div className="tv-card-overlay">
@@ -287,14 +269,15 @@ const FullScreenStrip = () => {
                                         </div>
                                         <p className="tv-item-desc">{item.desc}</p>
                                         {item.couponCode && (
-                                            <div className="tv-coupon-badge">PROMO CODE: {item.couponCode}</div>
+                                            <div className="tv-coupon-badge">PROMO: {item.couponCode}</div>
                                         )}
                                         <div className="tv-item-footer">
-                                            {item.price ? <span className="tv-price">₹{item.price.toLocaleString('en-IN')}</span> : <span className="tv-price">BOGO</span>}
-                                            <span className="tv-order-instruction">ORDER NOW AT THE COUNTER 🌟</span>
+                                            <span className="tv-price" style={{color:'#ffd700',WebkitTextFillColor:'#ffd700',background:'none'}}>
+                                                {item.price != null ? `₹${Number(item.price).toLocaleString('en-IN')}` : 'BOGO DEAL'}
+                                            </span>
+                                            <span className="tv-order-instruction">ORDER AT COUNTER ★</span>
                                         </div>
                                     </div>
-
                                 </div>
                             ))}
                         </div>

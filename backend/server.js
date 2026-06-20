@@ -163,3 +163,53 @@ setInterval(() => {
             console.error('❌ Keep-alive error:', err.message);
         });
 }, 14 * 60 * 1000); // 14 minutes
+
+// ── Store Hours Auto-Cron (runs every 60 seconds) ─────────────────────────────
+// Automatically opens/closes the store based on admin-configured hours in IST.
+const runStoreHoursCron = async () => {
+    try {
+        const Setting = (await import('./models/Setting.js')).default;
+
+        // Only run if auto-hours is enabled
+        const autoHoursSetting = await Setting.findOne({ key: 'store_auto_hours' });
+        if (!autoHoursSetting || autoHoursSetting.value !== 'true') return;
+
+        const openTimeSetting  = await Setting.findOne({ key: 'store_open_time' });
+        const closeTimeSetting = await Setting.findOne({ key: 'store_close_time' });
+
+        if (!openTimeSetting || !closeTimeSetting) return;
+
+        const openTime  = openTimeSetting.value;   // e.g. "11:00"
+        const closeTime = closeTimeSetting.value;  // e.g. "23:00"
+
+        // Get current IST time as HH:MM
+        const now = new Date();
+        const istFormatter = new Intl.DateTimeFormat('en-US', {
+            timeZone: 'Asia/Kolkata',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        });
+        const istTime = istFormatter.format(now).replace(/^24/, '00');
+
+        const shouldBeOpen = istTime >= openTime && istTime < closeTime;
+        const newStatus = shouldBeOpen ? 'open' : 'closed';
+
+        // Only write if status changed
+        const current = await Setting.findOne({ key: 'store_status' });
+        if (!current || current.value !== newStatus) {
+            await Setting.findOneAndUpdate(
+                { key: 'store_status' },
+                { value: newStatus },
+                { upsert: true, new: true }
+            );
+            console.log(`🕐 Store Hours Cron: status changed to "${newStatus}" at IST ${istTime}`);
+        }
+    } catch (err) {
+        console.error('Store hours cron error:', err.message);
+    }
+};
+
+// Run immediately on startup, then every 60 seconds
+setTimeout(runStoreHoursCron, 5000); // 5s delay to let DB connect first
+setInterval(runStoreHoursCron, 60 * 1000);

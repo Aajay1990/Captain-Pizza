@@ -1,412 +1,298 @@
-/* Cinematic TV Signage CSS Styles */
+/* ═══════════════════════════════════════════════════════════
+   Captain Pizza — TV Signage Styles
+═══════════════════════════════════════════════════════════ */
+
+/* Page */
 .tv-signage-page {
     width: 100vw;
     height: 100vh;
-    background: radial-gradient(circle at 50% 50%, #0c0b0e 0%, #030205 100%);
+    background: #030205;
     color: #fff;
     font-family: 'Outfit', 'Inter', sans-serif;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     overflow: hidden;
     position: relative;
     box-sizing: border-box;
-    /* Hide all scrollbars including when fullscreen */
     scrollbar-width: none;
     -ms-overflow-style: none;
 }
+.tv-signage-page::-webkit-scrollbar { display: none; }
+.tv-signage-page * { scrollbar-width: none; -ms-overflow-style: none; }
+.tv-signage-page *::-webkit-scrollbar { display: none; }
 
-.tv-signage-page::-webkit-scrollbar {
-    display: none;
-}
-
-/* Hide scrollbars globally inside the TV page */
-.tv-signage-page * {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-.tv-signage-page *::-webkit-scrollbar {
-    display: none;
-}
-
-/* ── Fullscreen browser-level scrollbar suppression ── */
-/* Targets the :fullscreen root regardless of which element is promoted */
-:fullscreen,
-:-webkit-full-screen,
-:-moz-full-screen,
-:-ms-fullscreen {
-    overflow: hidden !important;
-    scrollbar-width: none !important;
-    -ms-overflow-style: none !important;
-}
-
-:fullscreen::-webkit-scrollbar,
-:-webkit-full-screen::-webkit-scrollbar {
-    display: none !important;
-    width: 0 !important;
-}
-
-/* Also target html/body inside fullscreen context */
-:fullscreen body,
-:-webkit-full-screen body,
-:fullscreen html,
-:-webkit-full-screen html {
+/* Fullscreen scrollbar suppression */
+:fullscreen, :-webkit-full-screen, :-moz-full-screen, :-ms-fullscreen {
     overflow: hidden !important;
     scrollbar-width: none !important;
 }
+:fullscreen::-webkit-scrollbar, :-webkit-full-screen::-webkit-scrollbar {
+    display: none !important; width: 0 !important;
+}
+:fullscreen body, :-webkit-full-screen body { overflow: hidden !important; }
 
-
-/* Header Bar */
+/* ── Header Bar ─────────────────────────────────────────── */
 .tv-header-bar {
-    padding: 24px 40px;
+    padding: 16px 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: rgba(10, 10, 15, 0.7);
+    background: rgba(6, 6, 10, 0.88);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    z-index: 10;
-    transition: opacity 0.5s ease, transform 0.5s ease, max-height 0.5s ease, padding 0.5s ease;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    z-index: 20;
+    flex-shrink: 0;
+    transition: opacity 0.5s ease, max-height 0.5s ease, padding 0.5s ease;
 }
-
 .tv-header-bar.hidden {
-    opacity: 0;
-    transform: translateY(-100%);
-    pointer-events: none;
-    max-height: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    overflow: hidden;
-    border-bottom: none;
+    opacity: 0; pointer-events: none; max-height: 0;
+    padding-top: 0; padding-bottom: 0; overflow: hidden; border-bottom: none;
 }
+.tv-header-bar.visible { opacity: 1; max-height: 120px; }
 
-.tv-header-bar.visible {
-    opacity: 1;
-    transform: translateY(0);
-    max-height: 200px;
-}
-
-.tv-logo-area {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-}
+.tv-logo-area { display: flex; align-items: center; gap: 16px; }
 
 .tv-logo {
-    height: 60px;
-    width: auto;
-    filter: drop-shadow(0 0 10px rgba(225, 29, 72, 0.5));
+    height: 54px; width: auto;
+    filter: drop-shadow(0 0 10px rgba(225,29,72,0.5));
 }
 
+/* Gradient text — scoped to this element only, children inherit NONE of it */
 .tv-main-title {
-    font-size: 2.2rem;
+    font-size: 2rem;
     font-weight: 900;
     margin: 0;
     letter-spacing: -1px;
+    display: inline-block;
     background: linear-gradient(135deg, #ffffff 0%, #ffd700 100%);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
 }
 
 .tv-subtitle {
-    font-size: 0.95rem;
-    color: #94a3b8;
-    margin: 4px 0 0 0;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 2px;
+    font-size: 0.84rem; color: #94a3b8; margin: 3px 0 0 0;
+    font-weight: 600; text-transform: uppercase; letter-spacing: 2px;
 }
 
 .tv-control-btn {
-    background: rgba(225, 29, 72, 0.9);
-    border: none;
-    color: white;
-    padding: 12px 24px;
-    font-size: 1rem;
-    font-weight: 800;
-    border-radius: 12px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    box-shadow: 0 6px 20px rgba(225, 29, 72, 0.4);
+    background: rgba(225,29,72,0.9); border: none; color: #fff;
+    padding: 10px 22px; font-size: 0.95rem; font-weight: 800;
+    border-radius: 12px; cursor: pointer;
+    display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 6px 20px rgba(225,29,72,0.4);
     transition: all 0.2s ease;
 }
+.tv-control-btn:hover { transform: scale(1.05); background: #ff4757; }
 
-.tv-control-btn:hover {
-    transform: scale(1.05);
-    background: #ff4757;
-    box-shadow: 0 8px 25px rgba(225, 29, 72, 0.6);
-}
-
-/* Marquee Track Container */
+/* ── Marquee ─────────────────────────────────────────────── */
 .tv-marquee-container {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    width: 100%;
-    overflow: hidden;
-    position: relative;
-    background: radial-gradient(circle at 50% 50%, #0c0b0e 0%, #030205 100%);
+    flex: 1; display: flex; align-items: center;
+    width: 100%; overflow: hidden; position: relative;
+    background: #030205; min-height: 0;
 }
-
-.tv-track-wrapper {
-    display: block;
-    overflow: hidden;
-    width: 100%;
-    height: 100%;
-}
+.tv-track-wrapper { display: block; overflow: hidden; width: 100%; height: 100%; }
 
 .tv-track {
-    display: flex;
-    width: max-content;
-    flex-shrink: 0;
-    padding: 30px 0;
-    align-items: center;
-    animation: tvScrollMarquee 40s linear infinite;
+    display: flex; width: max-content; flex-shrink: 0;
+    padding: 22px 0; align-items: center;
+    animation: tvScrollMarquee 60s linear infinite;
     will-change: transform;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    transform: translate3d(0, 0, 0);
 }
+.tv-track:hover { animation-play-state: paused; }
 
-.tv-track:hover {
-    animation-play-state: paused;
-}
-
-.tv-content-set {
-    display: flex;
-    gap: 40px;
-    padding-right: 40px; /* Important for gap between the two cloned sets */
-    flex-shrink: 0;
-}
+.tv-content-set { display: flex; gap: 32px; padding-right: 32px; flex-shrink: 0; }
 
 @keyframes tvScrollMarquee {
     0%   { transform: translate3d(0, 0, 0); }
     100% { transform: translate3d(-50%, 0, 0); }
 }
 
-/* TV Domino's Card Style (Larger for TVs) */
+/* ── Card ────────────────────────────────────────────────── */
 .tv-dominos-card {
-    flex: 0 0 520px;
-    height: 580px;
-    border-radius: 32px;
+    flex: 0 0 480px;
+    height: 540px;
+    border-radius: 26px;
     overflow: hidden;
     position: relative;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 0 30px rgba(255, 255, 255, 0.02);
-    background: #0d0d12;
+    border: 1px solid rgba(255,255,255,0.09);
+    box-shadow: 0 16px 44px rgba(0,0,0,0.6);
+    background: #111118;
     box-sizing: border-box;
-    will-change: transform;
-    transform: translateZ(0);
 }
 
-/* Ribbon badge on card */
+/* Ribbon */
 .tv-ribbon {
-    position: absolute;
-    top: 0;
-    left: 30px;
+    position: absolute; top: 0; left: 26px;
     background: linear-gradient(135deg, #f59e0b, #d97706);
-    color: #fff;
-    padding: 10px 16px 14px;
-    font-weight: 900;
+    color: #fff; padding: 8px 14px 12px; font-weight: 900;
     border-radius: 0 0 10px 10px;
-    box-shadow: 0 5px 12px rgba(0,0,0,0.3);
-    z-index: 10;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    line-height: 1.1;
-    pointer-events: none;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.35);
+    z-index: 20; display: flex; flex-direction: column;
+    align-items: center; line-height: 1.1; pointer-events: none;
 }
+.tv-ribbon-brand { font-size: 0.6rem; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; }
+.tv-ribbon-title { font-size: 0.92rem; font-weight: 900; }
 
-.tv-ribbon-brand {
-    font-size: 0.65rem;
-    opacity: 0.9;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.tv-ribbon-title {
-    font-size: 1rem;
-    font-weight: 900;
-}
-
-/* TV Image container */
+/* ── Image — fills whole card, NO blur overlay layer ─────── */
 .tv-image-container {
-    width: 100%;
-    height: 100%;
     position: absolute;
-    top: 0;
-    left: 0;
-    background: #08080c;
+    inset: 0;
+    background: #111118;
     overflow: hidden;
+    z-index: 1;
 }
 
-.tv-card-img-blur {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: blur(25px) brightness(0.4);
-    transform: scale(1.15);
-    position: absolute;
-    top: 0;
-    left: 0;
-    opacity: 0.55;
-    pointer-events: none;
-}
+/* Blurred background removed — was causing the dark look */
+.tv-card-img-blur { display: none; }
 
 .tv-card-img-contain {
     position: absolute;
-    top: 0;
-    left: 0;
+    inset: 0;
     width: 100%;
-    height: 100%;
-    object-fit: contain;
-    object-position: center center;
-    z-index: 1;
+    /* Image fills TOP 65% of card — leaves clean space for info bar */
+    height: 65%;
+    object-fit: cover;
+    object-position: center top;
+    z-index: 2;
     display: block;
     transition: transform 0.5s ease;
 }
+.tv-dominos-card:hover .tv-card-img-contain { transform: scale(1.03); }
 
-.tv-dominos-card:hover .tv-card-img-contain {
-    transform: scale(1.04);
-}
-
-/* Promo Overlay */
-.tv-coupon-badge {
-    display: inline-block;
-    align-self: flex-start;
-    background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
-    color: #fff;
-    padding: 6px 14px;
-    border-radius: 10px;
-    font-size: 0.85rem;
-    font-weight: 900;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 4px 12px rgba(225, 29, 72, 0.4);
-    margin-bottom: 12px;
-    letter-spacing: 0.5px;
-    box-sizing: border-box;
-}
-
-/* Card details overlay */
+/* ── Info bar — solid dark section at bottom 35% ─────────── */
+/*
+   Instead of a gradient overlay ON TOP OF the image (which causes
+   the "black shadow"), we split the card:
+   - Top 65%: pure image, no overlay at all
+   - Bottom 35%: solid dark bar for text
+*/
 .tv-card-overlay {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 30px 24px 22px;
-    background: linear-gradient(to top, rgba(0,0,0,0.99) 0%, rgba(0,0,0,0.95) 60%, rgba(0,0,0,0.75) 85%, transparent 100%);
-    color: #fff;
+    height: 35%;          /* exactly 35% of 540px = ~189px */
+    z-index: 10;
+    box-sizing: border-box;
+    padding: 14px 20px 14px;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
-    box-sizing: border-box;
-    z-index: 5;
+    justify-content: center;
+    gap: 4px;
+    /* Clean solid bar — no gradient, no shadow on image */
+    background: #111118;
+    border-top: 1px solid rgba(255,255,255,0.07);
+}
+
+/* Small decorative gradient only at very top edge of the bar */
+.tv-card-overlay::before {
+    content: '';
+    position: absolute;
+    top: -28px;
+    left: 0; right: 0;
+    height: 28px;
+    background: linear-gradient(to top, rgba(17,17,24,0.95) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 1;
 }
 
 .tv-item-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px; margin-bottom: 0;
+    position: relative; z-index: 2;
 }
 
 .tv-veg-indicator {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 18px;
-    height: 18px;
-    border: 2px solid #22c55e;
-    padding: 2px;
-    border-radius: 4px;
-    background: #fff;
-    flex-shrink: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 15px; height: 15px; border: 2px solid #22c55e;
+    padding: 2px; border-radius: 3px; background: #fff; flex-shrink: 0;
 }
-
-.tv-veg-dot {
-    width: 8px;
-    height: 8px;
-    background: #22c55e;
-    border-radius: 50%;
-}
+.tv-veg-dot { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; }
 
 .tv-item-name {
-    font-size: 1.8rem;
-    font-weight: 900;
-    margin: 0;
-    text-shadow: 0 2px 5px rgba(0,0,0,0.5);
-    color: #fff;
-    letter-spacing: -0.5px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 1.4rem; font-weight: 900; margin: 0;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    background-clip: unset !important;
+    letter-spacing: -0.3px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    position: relative; z-index: 2;
 }
 
 .tv-item-desc {
-    font-size: 1rem;
-    color: rgba(255,255,255,0.85);
-    margin: 0 0 16px 0;
-    line-height: 1.4;
-    height: 56px;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.7) !important;
+    -webkit-text-fill-color: rgba(255,255,255,0.7) !important;
+    background: none !important;
+    margin: 0;
     overflow: hidden;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
+    position: relative; z-index: 2;
 }
 
+.tv-coupon-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+    color: #fff !important;
+    -webkit-text-fill-color: #fff !important;
+    padding: 3px 10px; border-radius: 7px;
+    font-size: 0.75rem; font-weight: 900;
+    margin-bottom: 2px; letter-spacing: 0.5px;
+    position: relative; z-index: 2;
+}
+
+/* Footer: price left, instruction right */
 .tv-item-footer {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+    margin-top: 2px;
+    position: relative; z-index: 2;
 }
 
+/* ★ PRICE ★ */
 .tv-price {
-    font-size: 2.2rem;
-    font-weight: 900;
-    color: #ffd700;
-    text-shadow: 0 2px 10px rgba(255, 215, 0, 0.4);
+    font-size: 1.85rem !important;
+    font-weight: 900 !important;
+    color: #ffd700 !important;
+    -webkit-text-fill-color: #ffd700 !important;
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    background-clip: unset !important;
+    text-shadow: 0 0 18px rgba(255,215,0,0.35);
+    line-height: 1;
 }
 
 .tv-order-instruction {
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.6);
-    font-weight: 800;
-    letter-spacing: 1px;
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.5) !important;
+    -webkit-text-fill-color: rgba(255,255,255,0.5) !important;
+    background: none !important;
+    font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;
 }
 
-/* Footer Ticker Bar */
+/* ── Footer Ticker ───────────────────────────────────────── */
 .tv-ticker-bar {
-    background: #6a0dad;
-    color: #fff;
-    padding: 14px 0;
-    width: 100vw;
-    overflow: hidden;
-    white-space: nowrap;
-    z-index: 10;
-    border-top: 1px solid rgba(255,255,255,0.1);
+    background: #6a0dad; color: #fff;
+    padding: 12px 0; width: 100vw;
+    overflow: hidden; white-space: nowrap;
+    z-index: 20; border-top: 1px solid rgba(255,255,255,0.1);
+    flex-shrink: 0;
 }
-
 .tv-ticker-text {
-    display: inline-block;
-    padding-left: 100%;
-    animation: tvTickerAnimation 35s linear infinite;
-    font-size: 1.25rem;
-    font-weight: 800;
-    letter-spacing: 1px;
-    text-transform: uppercase;
+    display: inline-block; padding-left: 100%;
+    animation: tvTickerAnimation 38s linear infinite;
+    font-size: 1.1rem; font-weight: 800;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: #fff !important;
+    -webkit-text-fill-color: #fff !important;
 }
-
 @keyframes tvTickerAnimation {
-    0% {
-        transform: translate3d(0, 0, 0);
-    }
-    100% {
-        transform: translate3d(-100%, 0, 0);
-    }
+    0%   { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-100%, 0, 0); }
 }

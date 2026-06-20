@@ -22,6 +22,7 @@ import FullScreenStrip from './pages/FullScreenStrip';
 
 import FloatingActions from './components/FloatingActions';
 import ProtectedRoute from './components/ProtectedRoute';
+import StoreClosedModal from './pages/StoreClosedModal';
 import './App.css';
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
 
   return (
     <div className="app-container">
+      <StoreClosedModal />
       <FloatingActions />
       {!hideHeaderFooter && <Navbar />}
 
