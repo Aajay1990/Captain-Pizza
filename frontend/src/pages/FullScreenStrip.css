@@ -88,21 +88,51 @@
 
 /* ── Marquee ─────────────────────────────────────────────── */
 .tv-marquee-container {
-    flex: 1; display: flex; align-items: center;
-    width: 100%; overflow: hidden; position: relative;
-    background: #030205; min-height: 0;
+    flex: 1 1 0;
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    background: #030205;
+    min-height: 0;
 }
-.tv-track-wrapper { display: block; overflow: hidden; width: 100%; height: 100%; }
+.tv-track-wrapper {
+    display: block;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+}
 
 .tv-track {
-    display: flex; width: max-content; flex-shrink: 0;
-    padding: 22px 0; align-items: center;
+    display: flex;
+    width: max-content;
+    flex-shrink: 0;
+    align-items: center;
+    height: 100%;
+    padding: 20px 0;
+    box-sizing: border-box;
     animation: tvScrollMarquee 60s linear infinite;
     will-change: transform;
 }
 .tv-track:hover { animation-play-state: paused; }
 
-.tv-content-set { display: flex; gap: 32px; padding-right: 32px; flex-shrink: 0; }
+/*
+  Card height = full viewport height  
+    minus header bar  (~86px)
+    minus ticker bar  (~48px)
+    minus track top+bottom padding (40px)
+    = 100vh - 174px  ≈ use 180px for safety
+  This fills the gap on every screen size automatically.
+*/
+.tv-content-set {
+    display: flex;
+    gap: 24px;
+    padding-right: 24px;
+    flex-shrink: 0;
+    align-items: center;
+    height: 100%;
+}
 
 @keyframes tvScrollMarquee {
     0%   { transform: translate3d(0, 0, 0); }
@@ -111,8 +141,13 @@
 
 /* ── Card ────────────────────────────────────────────────── */
 .tv-dominos-card {
-    flex: 0 0 480px;
-    height: 540px;
+    flex: 0 0 auto;
+    /*
+      Width derived from height via aspect ratio ~0.88 (480/540).
+      Height fills the space between header and ticker on any screen.
+    */
+    height: clamp(300px, calc(100vh - 180px), 700px);
+    width: clamp(260px, calc((100vh - 180px) * 0.88), 616px);
     border-radius: 26px;
     overflow: hidden;
     position: relative;
@@ -120,6 +155,7 @@
     box-shadow: 0 16px 44px rgba(0,0,0,0.6);
     background: #111118;
     box-sizing: border-box;
+    align-self: center;
 }
 
 /* Ribbon */
@@ -173,14 +209,14 @@
     bottom: 0;
     left: 0;
     right: 0;
-    height: 35%;          /* exactly 35% of 540px = ~189px */
+    height: 35%;          /* exactly 35% of card height */
     z-index: 10;
     box-sizing: border-box;
-    padding: 14px 20px 14px;
+    padding: clamp(8px, 1.5vh, 18px) clamp(12px, 2vw, 24px);
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 4px;
+    gap: clamp(2px, 0.4vh, 6px);
     /* Clean solid bar — no gradient, no shadow on image */
     background: #111118;
     border-top: 1px solid rgba(255,255,255,0.07);
@@ -211,7 +247,7 @@
 .tv-veg-dot { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; }
 
 .tv-item-name {
-    font-size: 1.4rem; font-weight: 900; margin: 0;
+    font-size: clamp(1.1rem, 2.4vh, 1.8rem); font-weight: 900; margin: 0;
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
     background: none !important;
@@ -223,7 +259,7 @@
 }
 
 .tv-item-desc {
-    font-size: 0.85rem;
+    font-size: clamp(0.85rem, 1.6vh, 1.1rem);
     color: rgba(255,255,255,0.7) !important;
     -webkit-text-fill-color: rgba(255,255,255,0.7) !important;
     background: none !important;
@@ -240,8 +276,8 @@
     background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
     color: #fff !important;
     -webkit-text-fill-color: #fff !important;
-    padding: 3px 10px; border-radius: 7px;
-    font-size: 0.75rem; font-weight: 900;
+    padding: 4px 12px; border-radius: 7px;
+    font-size: clamp(0.8rem, 1.4vh, 1rem); font-weight: 900;
     margin-bottom: 2px; letter-spacing: 0.5px;
     position: relative; z-index: 2;
 }
@@ -257,7 +293,7 @@
 
 /* ★ PRICE ★ */
 .tv-price {
-    font-size: 1.85rem !important;
+    font-size: clamp(1.5rem, 3.5vh, 2.4rem) !important;
     font-weight: 900 !important;
     color: #ffd700 !important;
     -webkit-text-fill-color: #ffd700 !important;
@@ -269,7 +305,7 @@
 }
 
 .tv-order-instruction {
-    font-size: 0.72rem;
+    font-size: clamp(0.7rem, 1.2vh, 0.9rem);
     color: rgba(255,255,255,0.5) !important;
     -webkit-text-fill-color: rgba(255,255,255,0.5) !important;
     background: none !important;

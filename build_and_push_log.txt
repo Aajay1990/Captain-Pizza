@@ -10,29 +10,16 @@ Changes not staged for commit:
   (use "git add <file>..." to update what will be committed)
   (use "git restore <file>..." to discard changes in working directory)
   (commit or discard the untracked or modified content in submodules)
-	modified:   backend/server.js
-	modified:   build_and_push.bat
 	modified:   build_and_push_log.txt
 	modified:   frontend/backend_v10_final (modified content)
 	modified:   frontend/backend_v13_final (modified content)
 	modified:   frontend/backend_v9_final (modified content)
-	modified:   frontend/src/App.jsx
 	modified:   frontend/src/pages/FullScreenStrip.css
-	modified:   frontend/src/pages/FullScreenStrip.jsx
-	modified:   frontend/src/pages/admin/AdminDashboard.css
-	modified:   frontend/src/pages/admin/AdminDashboard.jsx
-	modified:   frontend/src/pages/admin/SettingsManager.jsx
-
-Untracked files:
-  (use "git add <file>..." to include in what will be committed)
-	backend/uploads/image-1781979254462-650276557.png
-	frontend/src/pages/StoreClosedModal.css
-	frontend/src/pages/StoreClosedModal.jsx
 
 no changes added to commit (use "git add" and/or "git commit -a")
 [1.5/5] Installing backend dependencies... 
 
-up to date, audited 165 packages in 5s
+up to date, audited 165 packages in 3s
 
 26 packages are looking for funding
   run `npm fund` for details
@@ -75,7 +62,7 @@ rendering chunks...
 (!) C:/Users/lpawa/Downloads/captain pizza/frontend/src/apiConfig.js is dynamically imported by C:/Users/lpawa/Downloads/captain pizza/frontend/src/pages/admin/AdminDashboard.jsx but also statically imported by C:/Users/lpawa/Downloads/captain pizza/frontend/src/components/CartDrawer.jsx, C:/Users/lpawa/Downloads/captain pizza/frontend/src/context/AuthContext.jsx, C:/Users/lpawa/Downloads/captain pizza/frontend/src/pages/ForgotPassword.jsx, C:/Users/lpawa/Downloads/captain pizza/frontend/src/pages/FullScreenStrip.jsx, C:/Users/lpawa/Downloads/captain pizza/frontend/src/pages/Home.jsx, C:/Users/lpawa/Downloads/captain pizza/frontend/src/pages/Menu.jsx, C:/Users/lpawa/Downloads/captain pizza/frontend/src/pages/Order.jsx, C:/Users/lpawa/Downloads/captain pizza/frontend/src/pages/OrderHistory.jsx, C:/Users/lpawa/Downloads/captain pizza/frontend/src/pages/StoreClosedModal.jsx, C:/Users/lpawa/Downloads/captain pizza/frontend/src/pages/UserProfile.jsx, C:/Users/lpawa/Downloads/captain pizza/frontend/src/pages/VerifyEmail.jsx, C:/Users/lpawa/Downloads/captain pizza/frontend/src/pages/admin/DashboardStats.jsx, C:/Users/lpawa/Downloads/captain pizza/frontend/src/pages/admin/MenuManager.jsx, C:/Users/lpawa/Downloads/captain pizza/frontend/src/pages/admin/OfferManager.jsx, dynamic import will not move module into another chunk.
 [39m
 computing gzip size...
-[2mdist/[22m[32mindex.html                                       [39m[1m[2m    3.39 kB[22m[1m[22m[2m │ gzip:  1.39 kB[22m
+[2mdist/[22m[32mindex.html                                       [39m[1m[2m    3.39 kB[22m[1m[22m[2m │ gzip:  1.40 kB[22m
 [2mdist/[22m[32massets/qr code-sXZXiSBy.png                      [39m[1m[2m   33.39 kB[22m[1m[22m
 [2mdist/[22m[32massets/logo-sFvzCCTw.png                         [39m[1m[2m   58.18 kB[22m[1m[22m
 [2mdist/[22m[32massets/VANILA SHAKE-CbfiXqbF.png                 [39m[1m[2m  126.28 kB[22m[1m[22m
@@ -145,13 +132,14 @@ computing gzip size...
 [2mdist/[22m[32massets/Family Combo-Cy-MAq0M.png                 [39m[1m[2m1,701.02 kB[22m[1m[22m
 [2mdist/[22m[32massets/SWEET CORN-BcFwkwqd.png                   [39m[1m[2m1,725.42 kB[22m[1m[22m
 [2mdist/[22m[32massets/Super Value Friends Meal-C6O1Jl_J.png     [39m[1m[2m1,805.01 kB[22m[1m[22m
-[2mdist/[22m[35massets/index-8un_EpBH.css                        [39m[1m[2m  103.18 kB[22m[1m[22m[2m │ gzip: 20.69 kB[22m
+[2mdist/[22m[35massets/index-IXb7qP4o.css                        [39m[1m[2m  103.49 kB[22m[1m[22m[2m │ gzip: 20.81 kB[22m
 [2mdist/[22m[36massets/ui-BmiKgtxB.js                            [39m[1m[2m    0.79 kB[22m[1m[22m[2m │ gzip:  0.50 kB[22m
 [2mdist/[22m[36massets/react-Cxj_KmsH.js                         [39m[1m[2m  178.04 kB[22m[1m[22m[2m │ gzip: 58.40 kB[22m
-[2mdist/[22m[36massets/index-BMfthRIS.js                         [39m[1m[2m  265.61 kB[22m[1m[22m[2m │ gzip: 74.82 kB[22m
-[32m✓ built in 4.51s[39m
+[2mdist/[22m[36massets/index-UA97b1hP.js                         [39m[1m[2m  265.61 kB[22m[1m[22m[2m │ gzip: 74.82 kB[22m
+[32m✓ built in 5.66s[39m
 Build succeeded. 
 [2.5/5] Updating root dist folder... 
+Removing existing root dist folder... 
 Copying frontend/dist to root dist folder... 
 frontend\dist\.htaccess
 frontend\dist\favicon.ico
@@ -184,8 +172,8 @@ frontend\dist\assets\GOLDEN PARADISE-B3QfDC26.png
 frontend\dist\assets\GREEN APPLE-BIwgODqo.png
 frontend\dist\assets\hero-premium-pizza-BzCpwIch.png
 frontend\dist\assets\hero-user-pizza-TeHehsFi.jpg
-frontend\dist\assets\index-8un_EpBH.css
-frontend\dist\assets\index-BMfthRIS.js
+frontend\dist\assets\index-IXb7qP4o.css
+frontend\dist\assets\index-UA97b1hP.js
 frontend\dist\assets\instgram logo-qPap0a3R.png
 frontend\dist\assets\LEAMON ICE TEA-BeTP5tvb.png
 frontend\dist\assets\logo-sFvzCCTw.png
