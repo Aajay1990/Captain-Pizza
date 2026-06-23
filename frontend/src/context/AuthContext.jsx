@@ -6,7 +6,11 @@ import axios from 'axios';
 // Professional axios instance
 export const api = axios.create({
     baseURL: API_URL,
-    withCredentials: true
+    withCredentials: true,
+    headers: {
+        'Cache-Control': 'no-cache, no-store',
+        'Pragma': 'no-cache'
+    }
 });
 
 // Auto-attach any available admin/user token to every request (supporting legacy keys)
@@ -82,6 +86,9 @@ export const AuthProvider = ({ children }) => {
         const verifySession = async () => {
             const currentToken = token || readUserFromStorage()?.token;
             if (!currentToken) {
+                setUser(null);
+                setToken(null);
+                clearAllStorage();
                 setAuthLoading(false);
                 return;
             }
@@ -95,14 +102,17 @@ export const AuthProvider = ({ children }) => {
                     setUser(userData);
                     setToken(userData.token || currentToken);
                     saveUserToStorage({ ...userData, token: userData.token || currentToken });
-                }
-            } catch (err) {
-                // If 401/403, clear. If network error, maybe keep it?
-                if (err.response?.status === 401 || err.response?.status === 403) {
+                } else {
+                    // Unexpected success:false — treat as invalid session
                     setUser(null);
                     setToken(null);
                     clearAllStorage();
                 }
+            } catch (err) {
+                // Any error (401/403/network) — clear stale data to avoid showing previous user
+                setUser(null);
+                setToken(null);
+                clearAllStorage();
             } finally {
                 setAuthLoading(false);
             }
@@ -111,6 +121,8 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const loginAuth = (userData) => {
+        // Always wipe any previous user's data before saving the new session
+        clearAllStorage();
         setUser(userData);
         setToken(userData.token || null);
         saveUserToStorage(userData);

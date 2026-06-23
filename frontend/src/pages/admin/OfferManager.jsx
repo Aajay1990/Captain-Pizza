@@ -8,6 +8,7 @@ const OfferManager = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [currentOffer, setCurrentOffer] = useState(null);
     const [uploadingImage, setUploadingImage] = useState(false);
+    const [uploadingTvImage, setUploadingTvImage] = useState(false);
     const [saveError, setSaveError] = useState('');
     const [saveLoading, setSaveLoading] = useState(false);
 
@@ -38,7 +39,7 @@ const OfferManager = () => {
         discountType: 'PERCENT', discountValue: '',
         fixedPrice: '', priceMode: 'DISCOUNT',
         startDate: '', endDate: '',
-        isActive: true, bannerImage: '', couponCode: ''
+        isActive: true, bannerImage: '', tvImage: '', couponCode: ''
     };
     const [formData, setFormData] = useState(defaultFormState);
 
@@ -74,6 +75,27 @@ const OfferManager = () => {
         }
     };
 
+    const handleTvImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const fd = new FormData();
+        fd.append('image', file);
+        setUploadingTvImage(true);
+        try {
+            const res = await api.post('/api/upload', fd);
+            if (res.data.success) {
+                setFormData(prev => ({ ...prev, tvImage: res.data.image }));
+            } else {
+                alert('TV Image Upload Failed: ' + (res.data.message || 'Unknown'));
+            }
+        } catch (err) {
+            alert('TV Upload error: ' + (err.response?.data?.message || err.message));
+        } finally {
+            setUploadingTvImage(false);
+            e.target.value = null;
+        }
+    };
+
     const openEditor = (offer = null) => {
         setSaveError('');
         if (offer) {
@@ -95,6 +117,7 @@ const OfferManager = () => {
                 endDate: offer.endDate ? new Date(offer.endDate).toISOString().split('T')[0] : '',
                 isActive: offer.isActive,
                 bannerImage: bImage,
+                tvImage: offer.tvImage || '',
                 couponCode: offer.couponCode || ''
             });
             setCurrentOffer(offer);
@@ -160,6 +183,7 @@ const OfferManager = () => {
             endDate: formData.endDate,
             isActive: formData.isActive,
             bannerImage: finalBannerImage || '',
+            tvImage: formData.tvImage ? formData.tvImage.trim() : '',
             couponCode: formData.couponCode ? formData.couponCode.toUpperCase().trim() : '',
             fixedPrice: fixedPriceNum,
             discountType: formData.discountType,
@@ -453,44 +477,81 @@ const OfferManager = () => {
                                 </small>
                             </div>
 
-                            {/* Banner Image */}
-                            <div className="form-group">
-                                <label>Campaign Banner Image</label>
-                                <div className="admin-upload-zone"
-                                    onClick={() => document.getElementById('offer-image-upload').click()}
-                                    style={{ border: '2px dashed #ddd', borderRadius: '12px', padding: '20px', textAlign: 'center', cursor: 'pointer', background: '#fcfcfc', marginBottom: '8px', transition: 'border-color 0.2s' }}
-                                    onMouseEnter={e => e.currentTarget.style.borderColor = '#B71C1C'}
-                                    onMouseLeave={e => e.currentTarget.style.borderColor = '#ddd'}
-                                >
-                                    <input type="file" id="offer-image-upload" style={{ display: 'none' }} accept="image/*" onChange={handleImageUpload} />
-                                    {uploadingImage ? (
-                                        <div style={{ padding: '10px' }}>
-                                            <i className="fas fa-spinner fa-spin" style={{ fontSize: '2rem', color: 'var(--primary)' }}></i>
-                                            <p style={{ marginTop: '10px', fontWeight: '600' }}>Uploading image...</p>
+                            {/* Banner Images — Two uploads */}
+                            <div style={{ marginBottom: '15px' }}>
+                                <label style={{ fontWeight: '800', fontSize: '0.85rem', color: '#333', display: 'block', marginBottom: '12px' }}>
+                                    📸 Campaign Images
+                                </label>
+
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+
+                                    {/* Image 1 — User Panel Card (311×359) */}
+                                    <div>
+                                        <div style={{ fontSize: '0.75rem', fontWeight: '800', color: '#B71C1C', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                            🏠 User Panel Card
+                                            <span style={{ color: '#999', fontWeight: '400', marginLeft: '6px' }}>311 × 359 px</span>
                                         </div>
-                                    ) : (
-                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-                                            {formData.bannerImage && (
-                                                <img src={getImgSrc(formData.bannerImage.split('#price=')[0])} alt="Preview"
-                                                    style={{ height: '120px', maxWidth: '100%', borderRadius: '12px', objectFit: 'contain', boxShadow: '0 8px 24px rgba(0,0,0,0.12)' }} />
+                                        <div
+                                            onClick={() => document.getElementById('offer-image-upload').click()}
+                                            style={{ border: `2px dashed ${formData.bannerImage ? '#B71C1C' : '#ddd'}`, borderRadius: '10px', padding: '14px', textAlign: 'center', cursor: 'pointer', background: '#fcfcfc', transition: 'border-color 0.2s', minHeight: '130px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                                            onMouseEnter={e => e.currentTarget.style.borderColor = '#B71C1C'}
+                                            onMouseLeave={e => e.currentTarget.style.borderColor = formData.bannerImage ? '#B71C1C' : '#ddd'}
+                                        >
+                                            <input type="file" id="offer-image-upload" style={{ display: 'none' }} accept="image/*" onChange={handleImageUpload} />
+                                            {uploadingImage ? (
+                                                <><i className="fas fa-spinner fa-spin" style={{ fontSize: '1.6rem', color: '#B71C1C' }}></i><p style={{ margin: 0, fontSize: '0.8rem' }}>Uploading...</p></>
+                                            ) : formData.bannerImage ? (
+                                                <>
+                                                    <img src={getImgSrc(formData.bannerImage.split('#price=')[0])} alt="User card preview"
+                                                        style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: '8px' }} />
+                                                    <span style={{ fontSize: '0.7rem', color: '#B71C1C', fontWeight: '700' }}>🔄 Click to change</span>
+                                                    <button type="button" onClick={e => { e.stopPropagation(); setFormData(p => ({...p, bannerImage: ''})); }}
+                                                        style={{ fontSize: '0.7rem', color: '#999', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>✕ Remove</button>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <i className="fas fa-image" style={{ fontSize: '1.8rem', color: '#ccc' }}></i>
+                                                    <p style={{ margin: 0, fontSize: '0.75rem', fontWeight: '700', color: '#555' }}>Upload User Card Image</p>
+                                                    <span style={{ fontSize: '0.68rem', color: '#aaa' }}>Required: 311 × 359 px</span>
+                                                </>
                                             )}
-                                            <div style={{ padding: '6px' }}>
-                                                <i className="fas fa-camera" style={{ fontSize: '1.8rem', color: formData.bannerImage ? '#B71C1C' : '#ccc', marginBottom: '6px', display: 'block' }}></i>
-                                                <p style={{ margin: 0, fontWeight: '700', color: '#555' }}>
-                                                    {formData.bannerImage ? '🔄 Click to RENEW / Change Image' : '📸 Click to Upload Banner Image'}
-                                                </p>
-                                                <span style={{ fontSize: '0.75rem', color: '#999' }}>JPG, PNG, WEBP — Recommended: 1000×500px (2:1 landscape banner) so it fits perfectly without cropping.</span>
-                                            </div>
                                         </div>
-                                    )}
-                                </div>
-                                {/* Manual URL input */}
-                                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', opacity: 0.7 }}>
-                                    <span style={{ fontSize: '0.7rem', color: '#666', fontWeight: 'bold', whiteSpace: 'nowrap' }}>Or paste URL:</span>
-                                    <input type="text" value={formData.bannerImage ? formData.bannerImage.split('#price=')[0] : ''}
-                                        onChange={e => setFormData({ ...formData, bannerImage: e.target.value })}
-                                        style={{ fontSize: '0.75rem', flex: 1, padding: '6px', borderRadius: '4px', border: '1px solid #eee' }}
-                                        placeholder="https://example.com/banner.jpg" />
+                                    </div>
+
+                                    {/* Image 2 — TV Strip (509×434) */}
+                                    <div>
+                                        <div style={{ fontSize: '0.75rem', fontWeight: '800', color: '#1565C0', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                            📺 TV Strip Image
+                                            <span style={{ color: '#999', fontWeight: '400', marginLeft: '6px' }}>509 × 434 px</span>
+                                        </div>
+                                        <div
+                                            onClick={() => document.getElementById('offer-tv-image-upload').click()}
+                                            style={{ border: `2px dashed ${formData.tvImage ? '#1565C0' : '#ddd'}`, borderRadius: '10px', padding: '14px', textAlign: 'center', cursor: 'pointer', background: '#f8fbff', transition: 'border-color 0.2s', minHeight: '130px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                                            onMouseEnter={e => e.currentTarget.style.borderColor = '#1565C0'}
+                                            onMouseLeave={e => e.currentTarget.style.borderColor = formData.tvImage ? '#1565C0' : '#ddd'}
+                                        >
+                                            <input type="file" id="offer-tv-image-upload" style={{ display: 'none' }} accept="image/*" onChange={handleTvImageUpload} />
+                                            {uploadingTvImage ? (
+                                                <><i className="fas fa-spinner fa-spin" style={{ fontSize: '1.6rem', color: '#1565C0' }}></i><p style={{ margin: 0, fontSize: '0.8rem' }}>Uploading...</p></>
+                                            ) : formData.tvImage ? (
+                                                <>
+                                                    <img src={getImgSrc(formData.tvImage)} alt="TV preview"
+                                                        style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: '8px' }} />
+                                                    <span style={{ fontSize: '0.7rem', color: '#1565C0', fontWeight: '700' }}>🔄 Click to change</span>
+                                                    <button type="button" onClick={e => { e.stopPropagation(); setFormData(p => ({...p, tvImage: ''})); }}
+                                                        style={{ fontSize: '0.7rem', color: '#999', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>✕ Remove</button>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <i className="fas fa-tv" style={{ fontSize: '1.8rem', color: '#ccc' }}></i>
+                                                    <p style={{ margin: 0, fontSize: '0.75rem', fontWeight: '700', color: '#555' }}>Upload TV Strip Image</p>
+                                                    <span style={{ fontSize: '0.68rem', color: '#aaa' }}>Required: 509 × 434 px</span>
+                                                    <span style={{ fontSize: '0.65rem', color: '#bbb' }}>(Uses user card image if empty)</span>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
 

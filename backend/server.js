@@ -13,6 +13,7 @@ import toppingRoutes from './routes/toppingRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import offerRoutes from './routes/offerRoutes.js';
 import couponRoutes from './routes/couponRoutes.js';
+import Setting from './models/Setting.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
@@ -147,29 +148,15 @@ app.get('/', (req, res) => {
     res.send('🍕 Captain Pizza API is running!');
 });
 
-// ── Keep-Alive Ping (prevents Render free tier from sleeping) ─────────────────
-const SELF_URL = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
-setInterval(() => {
-    const healthUrl = `${SELF_URL}/health`;
-    fetch(healthUrl)
-        .then(res => {
-            if (res.ok) {
-                console.log(`🏓 Keep-alive ping successful: ${res.status}`);
-            } else {
-                console.log(`⚠️ Keep-alive ping returned status: ${res.status}`);
-            }
-        })
-        .catch(err => {
-            console.error('❌ Keep-alive error:', err.message);
-        });
-}, 14 * 60 * 1000); // 14 minutes
-
-// ── Store Hours Auto-Cron (runs every 60 seconds) ─────────────────────────────
-// Automatically opens/closes the store based on admin-configured hours in IST.
+// ── Store Hours Auto-Cron function (defined first so it can be referenced below) ──
 const runStoreHoursCron = async () => {
-    try {
-        const Setting = (await import('./models/Setting.js')).default;
+    // DB must be ready
+    if (mongoose.connection.readyState !== 1) {
+        console.warn('⏳ Cron skipped: DB not ready yet');
+        return;
+    }
 
+    try {
         // Only run if auto-hours is enabled
         const autoHoursSetting = await Setting.findOne({ key: 'store_auto_hours' });
         if (!autoHoursSetting || autoHoursSetting.value !== 'true') return;
@@ -203,13 +190,48 @@ const runStoreHoursCron = async () => {
                 { value: newStatus },
                 { upsert: true, new: true }
             );
-            console.log(`🕐 Store Hours Cron: status changed to "${newStatus}" at IST ${istTime}`);
+            console.log(`🕐 Store Hours Cron: status → "${newStatus}" at IST ${istTime}`);
         }
     } catch (err) {
-        console.error('Store hours cron error:', err.message);
+        console.error('❌ Store hours cron error:', err.message);
+        throw err; // re-throw so /cron/ping can return 500
     }
 };
 
-// Run immediately on startup, then every 60 seconds
-setTimeout(runStoreHoursCron, 5000); // 5s delay to let DB connect first
+// ── External Cron Trigger Endpoint ────────────────────────────────────────────
+// Call this from cron-job.org or UptimeRobot every 10 minutes:
+//   GET https://your-backend.onrender.com/cron/ping?secret=YOUR_CRON_SECRET
+app.get('/cron/ping', async (req, res) => {
+    const secret = process.env.CRON_SECRET;
+    if (secret && req.query.secret !== secret) {
+        return res.status(403).json({ success: false, message: 'Forbidden' });
+    }
+    try {
+        await runStoreHoursCron();
+        console.log('🌐 External cron ping received — store hours check complete');
+        res.json({ success: true, message: 'Cron executed', time: new Date().toISOString() });
+    } catch (err) {
+        console.error('❌ Cron ping error:', err.message);
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+// ── Keep-Alive Ping (fallback — external cron is the primary driver) ───────────
+// NOTE: Self-ping does NOT prevent Render free-tier sleep.
+// Use cron-job.org to hit /cron/ping every 10 min instead (see above).
+const SELF_URL = process.env.RENDER_EXTERNAL_URL
+    ? process.env.RENDER_EXTERNAL_URL.replace(/\/+$/, '')
+    : `http://localhost:${PORT}`;
+
+setInterval(() => {
+    fetch(`${SELF_URL}/health`)
+        .then(r => {
+            if (r.ok) console.log(`🏓 Keep-alive ping OK: ${r.status}`);
+            else console.log(`⚠️ Keep-alive ping status: ${r.status}`);
+        })
+        .catch(err => console.error('❌ Keep-alive error:', err.message));
+}, 14 * 60 * 1000); // every 14 min
+
+// Run store hours cron immediately on startup, then every 60 seconds
+setTimeout(runStoreHoursCron, 8000); // 8s delay to let DB connect first
 setInterval(runStoreHoursCron, 60 * 1000);

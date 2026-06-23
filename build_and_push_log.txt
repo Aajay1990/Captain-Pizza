@@ -2,24 +2,98 @@ Running build and push process...
 ==================================== 
 Using system git. 
  
-[1/5] Git status: 
+[1/6] Git status: 
 On branch main
 Your branch is up to date with 'origin/main'.
 
 Changes not staged for commit:
-  (use "git add <file>..." to update what will be committed)
+  (use "git add/rm <file>..." to update what will be committed)
   (use "git restore <file>..." to discard changes in working directory)
   (commit or discard the untracked or modified content in submodules)
+	modified:   backend/controllers/authController.js
+	modified:   backend/models/SeasonalOffer.js
+	modified:   backend/server.js
+	modified:   build_and_push.bat
 	modified:   build_and_push_log.txt
+	deleted:    dist/assets/FARM HOUSE-Do_2cCPv.png
+	deleted:    dist/assets/FRENCH FRIES-DfOJtJGK.png
+	deleted:    dist/assets/Family Combo-Cy-MAq0M.png
+	deleted:    dist/assets/GOLDEN CORN VEG-BsAvN6Dx.png
+	deleted:    dist/assets/GOLDEN LOVER -DgnPsaOj.png
+	deleted:    dist/assets/GOLDEN PARADISE-B3QfDC26.png
+	deleted:    dist/assets/GREEN APPLE-BIwgODqo.png
+	deleted:    dist/assets/LEAMON ICE TEA-BeTP5tvb.png
+	deleted:    dist/assets/MAKHANI SAUCE PASTA-CCQaIHnl.png
+	deleted:    dist/assets/MASALA SODA-DCKFMSX1.png
+	deleted:    dist/assets/MAXICAN SPECIAL-BCvj0wb8.png
+	deleted:    dist/assets/MAXICAN SPECIAL2-BUi43Ios.png
+	deleted:    dist/assets/MERGHERITA-D5TS4pf9.png
+	deleted:    dist/assets/MINT MOJITO-C2D2ZEnC.png
+	deleted:    dist/assets/MIX MASTI VEG-C-GLHkih.png
+	deleted:    dist/assets/MONSTER CLUB WRAP-DMRv4ZHZ.png
+	deleted:    dist/assets/MONSTER CLUB-Z9J5gvY7.png
+	deleted:    dist/assets/ONION-Yblglm4K.png
+	deleted:    dist/assets/ONION_ JALAPENO-jQio3A26.png
+	deleted:    dist/assets/OREO SHAKE-Dy-npiXl.png
+	deleted:    dist/assets/PANEER WRAP-BPdzmSEi.png
+	deleted:    dist/assets/PERI PERI FRIES-ClpFDiG3.png
+	deleted:    dist/assets/Paneer _ Onion-CIRhc8Rp.png
+	deleted:    dist/assets/RED SAUCE PASTA-B35D0m82.png
+	deleted:    dist/assets/SPICY STUFFED GARLIC BREAD-BR9Pp8TO.png
+	deleted:    dist/assets/SPICY VEG-DCZUUqcw.png
+	deleted:    dist/assets/SPICY WONDER-B7qgkEi9.png
+	deleted:    dist/assets/SPL. DELUXE VEG-Bgwkhi_9.png
+	deleted:    dist/assets/SPL. DOUBLE CHEES MARGERITA-DwvcrZ3t.png
+	deleted:    dist/assets/SPL. MAKHANI PANEER-RUZkAoit.png
+	deleted:    dist/assets/SPL. PUNJABI PANEER MASTI-PKdvkYUJ.png
+	deleted:    dist/assets/SPL. SPICY PEPPY PANEER-3yDVKV93.png
+	deleted:    dist/assets/SPL. SUPREME VEG-DR7QLJA9.png
+	deleted:    dist/assets/STRAWBERRY SHAKE-Dbo9Vy3U.png
+	deleted:    dist/assets/SWEET CORN-BcFwkwqd.png
+	deleted:    dist/assets/Super Value Friends Meal-C6O1Jl_J.png
+	deleted:    dist/assets/TANDOORI SAUCE PASTA-rLiiGbUl.png
+	deleted:    dist/assets/TOMATO _ CAPSICUM-FEcSegn4.png
+	deleted:    dist/assets/TOMATO-BeuvbiCd.png
+	deleted:    dist/assets/VANILA SHAKE-CbfiXqbF.png
+	deleted:    dist/assets/VEG TIKKI BURGER-CFAGfajJ.png
+	deleted:    dist/assets/VEG TIKKI WRAP-DgqWX4o3.png
+	deleted:    dist/assets/VEG. GRILL SANDWICH-wfjnMR0y.png
+	deleted:    dist/assets/WATERMELON -CMA6RMVm.png
+	deleted:    dist/assets/WHITE SAUCE PASTA-ByuhqDWf.png
+	deleted:    dist/assets/hero-premium-pizza-BzCpwIch.png
+	deleted:    dist/assets/hero-user-pizza-TeHehsFi.jpg
+	deleted:    dist/assets/index-IXb7qP4o.css
+	deleted:    dist/assets/index-UA97b1hP.js
+	deleted:    dist/assets/instgram logo-qPap0a3R.png
+	deleted:    dist/assets/logo-sFvzCCTw.png
+	deleted:    dist/assets/luxury-hero-pizza-BWunWtcg.png
+	deleted:    dist/assets/pizza menu 1-C6M9EJKI.png
+	deleted:    dist/assets/pizza menu 2-DnjiEF3N.png
+	deleted:    dist/assets/qr code-sXZXiSBy.png
+	deleted:    dist/assets/react-Cxj_KmsH.js
+	deleted:    dist/assets/ui-BmiKgtxB.js
+	modified:   dist/index.html
 	modified:   frontend/backend_v10_final (modified content)
 	modified:   frontend/backend_v13_final (modified content)
 	modified:   frontend/backend_v9_final (modified content)
+	deleted:    frontend/dist/assets/index-IXb7qP4o.css
+	deleted:    frontend/dist/assets/index-UA97b1hP.js
+	modified:   frontend/dist/index.html
+	modified:   frontend/src/context/AuthContext.jsx
 	modified:   frontend/src/pages/FullScreenStrip.css
+	modified:   frontend/src/pages/FullScreenStrip.jsx
+	modified:   frontend/src/pages/Home.css
+	modified:   frontend/src/pages/admin/OfferManager.jsx
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	frontend/dist/assets/index-0cNT_6q9.css
+	frontend/dist/assets/index-BFKMIxUk.js
 
 no changes added to commit (use "git add" and/or "git commit -a")
-[1.5/5] Installing backend dependencies... 
+[1.5/6] Installing backend dependencies... 
 
-up to date, audited 165 packages in 3s
+up to date, audited 165 packages in 2s
 
 26 packages are looking for funding
   run `npm fund` for details
@@ -33,9 +107,9 @@ To address all issues (including breaking changes), run:
   npm audit fix --force
 
 Run `npm audit` for details.
-[1.6/5] Installing frontend dependencies... 
+[1.6/6] Installing frontend dependencies... 
 
-up to date, audited 284 packages in 3s
+up to date, audited 284 packages in 2s
 
 113 packages are looking for funding
   run `npm fund` for details
@@ -49,7 +123,7 @@ To address all issues (including breaking changes), run:
   npm audit fix --force
 
 Run `npm audit` for details.
-[2/5] Building frontend... 
+[2/6] Building frontend... 
 
 > frontend@0.0.0 build
 > vite build
@@ -132,15 +206,13 @@ computing gzip size...
 [2mdist/[22m[32massets/Family Combo-Cy-MAq0M.png                 [39m[1m[2m1,701.02 kB[22m[1m[22m
 [2mdist/[22m[32massets/SWEET CORN-BcFwkwqd.png                   [39m[1m[2m1,725.42 kB[22m[1m[22m
 [2mdist/[22m[32massets/Super Value Friends Meal-C6O1Jl_J.png     [39m[1m[2m1,805.01 kB[22m[1m[22m
-[2mdist/[22m[35massets/index-IXb7qP4o.css                        [39m[1m[2m  103.49 kB[22m[1m[22m[2m │ gzip: 20.81 kB[22m
+[2mdist/[22m[35massets/index-0cNT_6q9.css                        [39m[1m[2m  103.46 kB[22m[1m[22m[2m │ gzip: 20.79 kB[22m
 [2mdist/[22m[36massets/ui-BmiKgtxB.js                            [39m[1m[2m    0.79 kB[22m[1m[22m[2m │ gzip:  0.50 kB[22m
 [2mdist/[22m[36massets/react-Cxj_KmsH.js                         [39m[1m[2m  178.04 kB[22m[1m[22m[2m │ gzip: 58.40 kB[22m
-[2mdist/[22m[36massets/index-UA97b1hP.js                         [39m[1m[2m  265.61 kB[22m[1m[22m[2m │ gzip: 74.82 kB[22m
-[32m✓ built in 5.66s[39m
+[2mdist/[22m[36massets/index-BFKMIxUk.js                         [39m[1m[2m  267.88 kB[22m[1m[22m[2m │ gzip: 75.01 kB[22m
+[32m✓ built in 3.45s[39m
 Build succeeded. 
-[2.5/5] Updating root dist folder... 
-Removing existing root dist folder... 
-Copying frontend/dist to root dist folder... 
+[2.5/6] Updating root dist folder... 
 frontend\dist\.htaccess
 frontend\dist\favicon.ico
 frontend\dist\favicon.png
@@ -172,8 +244,8 @@ frontend\dist\assets\GOLDEN PARADISE-B3QfDC26.png
 frontend\dist\assets\GREEN APPLE-BIwgODqo.png
 frontend\dist\assets\hero-premium-pizza-BzCpwIch.png
 frontend\dist\assets\hero-user-pizza-TeHehsFi.jpg
-frontend\dist\assets\index-IXb7qP4o.css
-frontend\dist\assets\index-UA97b1hP.js
+frontend\dist\assets\index-0cNT_6q9.css
+frontend\dist\assets\index-BFKMIxUk.js
 frontend\dist\assets\instgram logo-qPap0a3R.png
 frontend\dist\assets\LEAMON ICE TEA-BeTP5tvb.png
 frontend\dist\assets\logo-sFvzCCTw.png
@@ -221,5 +293,21 @@ frontend\dist\assets\VEG. GRILL SANDWICH-wfjnMR0y.png
 frontend\dist\assets\WATERMELON -CMA6RMVm.png
 frontend\dist\assets\WHITE SAUCE PASTA-ByuhqDWf.png
 79 File(s) copied
-Root dist folder updated successfully. 
-[3/5] Staging changes... 
+Root dist folder updated. 
+[3/6] Staging backend + frontend + dist... 
+warning: in the working copy of 'frontend/dist/assets/react-Cxj_KmsH.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/dist/assets/ui-BmiKgtxB.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/dist/index.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/package-lock.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/pages/FullScreenStrip.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/pages/FullScreenStrip.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/pages/admin/OfferManager.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/dist/assets/index-0cNT_6q9.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/dist/assets/index-BFKMIxUk.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'dist/.htaccess', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'dist/_redirects', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'dist/assets/react-Cxj_KmsH.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'dist/assets/ui-BmiKgtxB.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'dist/index.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'dist/assets/index-0cNT_6q9.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'dist/assets/index-BFKMIxUk.js', LF will be replaced by CRLF the next time Git touches it

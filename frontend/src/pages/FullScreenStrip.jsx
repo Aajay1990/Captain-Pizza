@@ -143,11 +143,12 @@ const FullScreenStrip = () => {
             }
 
             const cleanImage = o.bannerImage ? o.bannerImage.split('#price=')[0] : '';
+            const tvImg = o.tvImage ? o.tvImage.trim() : cleanImage; // prefer tvImage for TV strip
             return {
                 id: o._id || `db-off-${idx}`, 
                 title: o.title, 
                 desc: o.description, 
-                image: getImgSrc(cleanImage), 
+                image: getImgSrc(tvImg || cleanImage), 
                 badge: 'DEAL', 
                 price: extractedPrice,
                 couponCode: o.couponCode
@@ -193,10 +194,6 @@ const FullScreenStrip = () => {
                         <div className="tv-content-set">
                             {marqueeOffers.map((item, idx) => (
                                 <div key={(item.id || idx) + '-tv-1-' + idx} className="tv-dominos-card">
-                                    <div className="tv-ribbon">
-                                        <span className="tv-ribbon-brand">Captain's</span>
-                                        <span className="tv-ribbon-title">{item.badge || 'SPECIAL'}</span>
-                                    </div>
                                     <div className="tv-image-container">
                                         {item.image && !item.image.includes('/') && !item.image.includes('http') && !item.image.includes('data:') ? (
                                             <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'9rem',background:'#1a1a24'}}>
@@ -239,10 +236,6 @@ const FullScreenStrip = () => {
                         <div className="tv-content-set">
                             {marqueeOffers.map((item, idx) => (
                                 <div key={(item.id || idx) + '-tv-2-' + idx} className="tv-dominos-card">
-                                    <div className="tv-ribbon">
-                                        <span className="tv-ribbon-brand">Captain's</span>
-                                        <span className="tv-ribbon-title">{item.badge || 'SPECIAL'}</span>
-                                    </div>
                                     <div className="tv-image-container">
                                         {item.image && !item.image.includes('/') && !item.image.includes('http') && !item.image.includes('data:') ? (
                                             <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'9rem',background:'#1a1a24'}}>

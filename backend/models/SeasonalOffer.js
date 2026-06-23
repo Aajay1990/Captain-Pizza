@@ -4,14 +4,15 @@ const seasonalOfferSchema = new mongoose.Schema({
     title: { type: String, required: true },
     description: { type: String },
     priceMode: { type: String, enum: ['DISCOUNT', 'FIXED'], default: 'DISCOUNT' },
-    discountType: { type: String, enum: ['PERCENT', 'AMOUNT'], default: 'PERCENT' }, // Not required — FIXED mode doesn't use it
+    discountType: { type: String, enum: ['PERCENT', 'AMOUNT'], default: 'PERCENT' },
     discountValue: { type: Number },
-    fixedPrice: { type: Number }, // Admin-set direct price (used when priceMode === 'FIXED')
+    fixedPrice: { type: Number },
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
     isActive: { type: Boolean, default: true },
-    bannerImage: { type: String },
-    couponCode: { type: String } // Optional promo code shown to users
+    bannerImage: { type: String }, // User panel card image — 311×359px
+    tvImage: { type: String },     // TV strip image — 509×434px (falls back to bannerImage if not set)
+    couponCode: { type: String }
 }, {
     timestamps: true
 });

@@ -110,7 +110,7 @@
     flex-shrink: 0;
     align-items: center;
     height: 100%;
-    padding: 20px 0;
+    padding: 10px 0;
     box-sizing: border-box;
     animation: tvScrollMarquee 60s linear infinite;
     will-change: transform;
@@ -139,15 +139,11 @@
     100% { transform: translate3d(-50%, 0, 0); }
 }
 
-/* ── Card ────────────────────────────────────────────────── */
+/* ── Card ────────────────────────────────────────────── */
 .tv-dominos-card {
-    flex: 0 0 auto;
-    /*
-      Width derived from height via aspect ratio ~0.88 (480/540).
-      Height fills the space between header and ticker on any screen.
-    */
-    height: clamp(300px, calc(100vh - 180px), 700px);
-    width: clamp(260px, calc((100vh - 180px) * 0.88), 616px);
+    flex: 0 0 509px;
+    width: 509px;
+    height: 434px;
     border-radius: 26px;
     overflow: hidden;
     position: relative;
@@ -187,8 +183,8 @@
     position: absolute;
     inset: 0;
     width: 100%;
-    /* Image fills TOP 65% of card — leaves clean space for info bar */
-    height: 65%;
+    /* Image fills TOP 75% of card — leaves clean space for info bar */
+    height: 75%;
     object-fit: cover;
     object-position: center top;
     z-index: 2;
@@ -197,26 +193,26 @@
 }
 .tv-dominos-card:hover .tv-card-img-contain { transform: scale(1.03); }
 
-/* ── Info bar — solid dark section at bottom 35% ─────────── */
+/* ── Info bar — solid dark section at bottom 25% ─────────── */
 /*
    Instead of a gradient overlay ON TOP OF the image (which causes
    the "black shadow"), we split the card:
-   - Top 65%: pure image, no overlay at all
-   - Bottom 35%: solid dark bar for text
+   - Top 75%: pure image, no overlay at all
+   - Bottom 25%: solid dark bar for text
 */
 .tv-card-overlay {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 35%;          /* exactly 35% of card height */
+    height: 25%;          /* exactly 25% of card height */
     z-index: 10;
     box-sizing: border-box;
-    padding: clamp(8px, 1.5vh, 18px) clamp(12px, 2vw, 24px);
+    padding: clamp(6px, 1vh, 14px) clamp(12px, 2vw, 24px);
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: clamp(2px, 0.4vh, 6px);
+    gap: clamp(2px, 0.3vh, 5px);
     /* Clean solid bar — no gradient, no shadow on image */
     background: #111118;
     border-top: 1px solid rgba(255,255,255,0.07);
@@ -247,7 +243,7 @@
 .tv-veg-dot { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; }
 
 .tv-item-name {
-    font-size: clamp(1.1rem, 2.4vh, 1.8rem); font-weight: 900; margin: 0;
+    font-size: clamp(1.4rem, 3vh, 2.2rem); font-weight: 900; margin: 0;
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
     background: none !important;
@@ -259,7 +255,7 @@
 }
 
 .tv-item-desc {
-    font-size: clamp(0.85rem, 1.6vh, 1.1rem);
+    font-size: clamp(1rem, 2vh, 1.35rem);
     color: rgba(255,255,255,0.7) !important;
     -webkit-text-fill-color: rgba(255,255,255,0.7) !important;
     background: none !important;
@@ -276,8 +272,8 @@
     background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
     color: #fff !important;
     -webkit-text-fill-color: #fff !important;
-    padding: 4px 12px; border-radius: 7px;
-    font-size: clamp(0.8rem, 1.4vh, 1rem); font-weight: 900;
+    padding: 5px 14px; border-radius: 7px;
+    font-size: clamp(0.95rem, 1.7vh, 1.2rem); font-weight: 900;
     margin-bottom: 2px; letter-spacing: 0.5px;
     position: relative; z-index: 2;
 }
@@ -293,7 +289,7 @@
 
 /* ★ PRICE ★ */
 .tv-price {
-    font-size: clamp(1.5rem, 3.5vh, 2.4rem) !important;
+    font-size: clamp(1.9rem, 4.2vh, 3rem) !important;
     font-weight: 900 !important;
     color: #ffd700 !important;
     -webkit-text-fill-color: #ffd700 !important;
@@ -305,7 +301,7 @@
 }
 
 .tv-order-instruction {
-    font-size: clamp(0.7rem, 1.2vh, 0.9rem);
+    font-size: clamp(0.85rem, 1.5vh, 1.1rem);
     color: rgba(255,255,255,0.5) !important;
     -webkit-text-fill-color: rgba(255,255,255,0.5) !important;
     background: none !important;

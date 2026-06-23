@@ -139,6 +139,12 @@ export const verifyEmail = async (req, res) => {
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
+
+        // Guard: missing credentials
+        if (!email || !password) {
+            return res.status(400).json({ success: false, message: 'Email and password are required.' });
+        }
+
         const normalizedEmail = email.trim().toLowerCase();
 
         const user = await User.findOne({ email: normalizedEmail });
@@ -178,7 +184,7 @@ export const login = async (req, res) => {
         });
 
     } catch (error) {
-        console.error(error);
+        console.error('[LOGIN ERROR]', error.stack || error);
         res.status(500).json({ success: false, message: 'Server error during login process.' });
     }
 };

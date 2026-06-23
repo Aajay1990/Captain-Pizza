@@ -40,7 +40,7 @@ echo. >> build_and_push_log.txt
 
 :: Initialize Git if .git folder doesn't exist
 if not exist ".git" (
-    echo [0/5] Initializing Git repository...
+    echo [0/6] Initializing Git repository...
     echo Git repository is not initialized. Initializing now... >> build_and_push_log.txt
     "%GIT_CMD%" init >> build_and_push_log.txt 2>&1
     "%GIT_CMD%" branch -M main >> build_and_push_log.txt 2>&1
@@ -60,52 +60,49 @@ if "%CHECK_EMAIL%"=="" goto :setup_config
 :: Get or set remote origin
 "%GIT_CMD%" remote get-url origin >nul 2>&1
 if %errorlevel% neq 0 (
-    echo Adding remote origin to https://github.com/Aajay1990/Captain-Pizza.git >> build_and_push_log.txt
+    echo Adding remote origin... >> build_and_push_log.txt
     "%GIT_CMD%" remote add origin "https://github.com/Aajay1990/Captain-Pizza.git" >> build_and_push_log.txt 2>&1
 )
 
-:: Remove submodule Git folders if they exist
+:: Remove nested .git folders that cause submodule issues
 if exist "backend\.git" (
-    echo Removing nested .git folder from backend to prevent submodule issues...
-    echo Removing backend\.git >> build_and_push_log.txt
+    echo Removing nested backend\.git... >> build_and_push_log.txt
     rmdir /s /q "backend\.git" >> build_and_push_log.txt 2>&1
     "%GIT_CMD%" rm --cached -f backend >> build_and_push_log.txt 2>&1
 )
-
 if exist "frontend\.git" (
-    echo Removing nested .git folder from frontend to prevent submodule issues...
-    echo Removing frontend\.git >> build_and_push_log.txt
+    echo Removing nested frontend\.git... >> build_and_push_log.txt
     rmdir /s /q "frontend\.git" >> build_and_push_log.txt 2>&1
     "%GIT_CMD%" rm --cached -f frontend >> build_and_push_log.txt 2>&1
 )
 
-echo [1/5] Git status: >> build_and_push_log.txt
+echo [1/6] Git status: >> build_and_push_log.txt
 "%GIT_CMD%" status >> build_and_push_log.txt 2>&1
 
-:: Check if user wants to update dependencies
+:: Ask about npm install
 echo.
 set "INSTALL_CHOICE=n"
-set /p INSTALL_CHOICE="Do you want to run 'npm install' for backend and frontend? (y/n, default: n): "
+set /p INSTALL_CHOICE="Run 'npm install' for backend and frontend? (y/n, default: n): "
 if /i "%INSTALL_CHOICE%"=="y" (
-    echo [1.5/5] Installing backend dependencies... >> build_and_push_log.txt
+    echo [1.5/6] Installing backend dependencies... >> build_and_push_log.txt
     echo Installing backend dependencies...
     cd backend
     call npm install >> ..\build_and_push_log.txt 2>&1
     cd ..
-    
-    echo [1.6/5] Installing frontend dependencies... >> build_and_push_log.txt
+
+    echo [1.6/6] Installing frontend dependencies... >> build_and_push_log.txt
     echo Installing frontend dependencies...
     cd frontend
     call npm install >> ..\build_and_push_log.txt 2>&1
     cd ..
 )
 
-echo [2/5] Building frontend... >> build_and_push_log.txt
+echo [2/6] Building frontend... >> build_and_push_log.txt
 echo Building frontend...
 cd frontend
 call npm run build >> ..\build_and_push_log.txt 2>&1
 if %errorlevel% neq 0 (
-    echo BUILD FAILED in log.
+    echo BUILD FAILED — check build_and_push_log.txt
     cd ..
     pause
     exit /b 1
@@ -113,18 +110,16 @@ if %errorlevel% neq 0 (
 cd ..
 echo Build succeeded. >> build_and_push_log.txt
 
-echo [2.5/5] Updating root dist folder... >> build_and_push_log.txt
+echo [2.5/6] Updating root dist folder... >> build_and_push_log.txt
 echo Updating root dist folder...
 if exist "dist" (
-    echo Removing existing root dist folder... >> build_and_push_log.txt
     rmdir /s /q "dist" >> build_and_push_log.txt 2>&1
 )
-echo Copying frontend/dist to root dist folder... >> build_and_push_log.txt
 xcopy /e /i /y "frontend\dist" "dist" >> build_and_push_log.txt 2>&1
 if %errorlevel% neq 0 (
-    echo WARNING: Failed to copy frontend/dist to root dist folder. >> build_and_push_log.txt
+    echo WARNING: Failed to copy dist >> build_and_push_log.txt
 ) else (
-    echo Root dist folder updated successfully. >> build_and_push_log.txt
+    echo Root dist folder updated. >> build_and_push_log.txt
 )
 
 echo.
@@ -137,21 +132,28 @@ if "%COMMIT_MSG%"=="" (
     set COMMIT_MSG=Update backend and frontend dist folder
 )
 
-echo [3/5] Staging changes... >> build_and_push_log.txt
+echo [3/6] Staging backend + frontend + dist... >> build_and_push_log.txt
+"%GIT_CMD%" add backend/ >> build_and_push_log.txt 2>&1
+"%GIT_CMD%" add frontend/ >> build_and_push_log.txt 2>&1
+"%GIT_CMD%" add dist/ >> build_and_push_log.txt 2>&1
 "%GIT_CMD%" add -A >> build_and_push_log.txt 2>&1
+echo Staging complete. >> build_and_push_log.txt
 
-echo [4/5] Committing changes... >> build_and_push_log.txt
+echo [4/6] Committing... >> build_and_push_log.txt
 "%GIT_CMD%" commit -m "%COMMIT_MSG%" >> build_and_push_log.txt 2>&1
 
-echo [5/5] Pushing to GitHub... >> build_and_push_log.txt
+echo [5/6] Pushing to GitHub... >> build_and_push_log.txt
 "%GIT_CMD%" push -u origin main >> build_and_push_log.txt 2>&1
 if %errorlevel% neq 0 (
-    echo Failed standard push. Trying force push... >> build_and_push_log.txt
+    echo Standard push failed. Trying force push... >> build_and_push_log.txt
     "%GIT_CMD%" push -u origin main --force >> build_and_push_log.txt 2>&1
 )
 
-echo Done. >> build_and_push_log.txt
-echo Log file build_and_push_log.txt has been updated.
+echo [6/6] Done! >> build_and_push_log.txt
+echo.
+echo ========================================================
+echo  PUSH COMPLETE — check build_and_push_log.txt for details
+echo ========================================================
 pause
 exit /b 0
 
@@ -163,8 +165,6 @@ echo ========================================================
 set /p GIT_EMAIL="Enter your GitHub Email: "
 set /p GIT_NAME="Enter your GitHub Name/Username: "
 
-echo Setting global email to "%GIT_EMAIL%" >> build_and_push_log.txt
 "%GIT_CMD%" config --global user.email "%GIT_EMAIL%" >> build_and_push_log.txt 2>&1
-echo Setting global name to "%GIT_NAME%" >> build_and_push_log.txt
 "%GIT_CMD%" config --global user.name "%GIT_NAME%" >> build_and_push_log.txt 2>&1
 goto :git_config_done
